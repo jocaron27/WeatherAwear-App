@@ -1,5 +1,5 @@
 import axios from 'axios';
-const mockData = require('./mockData.json');
+import * as mockData from './mockData.json';
 import { storeCacheData, getCacheData, getAllCacheKeys, clearCacheValue } from './cache';
 
 const useMock = true;
@@ -127,7 +127,7 @@ export const getWeather = async ({ location = '' } ) => {
         } catch(error) {
             // Cache data is bad, so clear
             clearCacheValue(cacheKey);
-            console.error(error); // TODO: send this somewhere?
+            console.error(error);
         }
     }
     // Return data
@@ -139,13 +139,13 @@ export const getWeather = async ({ location = '' } ) => {
         .then(response => {
             console.log('res', response);
             if (response.error) {
-                console.error(error); // TODO: send this somewhere?
+                console.error(error);
                 return null;
             }
             storeCacheData(cacheKey, response);
             return formatWeatherResponse(response);
         })
         .catch(error => {
-            console.error(error); // TODO: send this somewhere?
+            console.error(error);
         });
 }

@@ -24,7 +24,7 @@ import * as Sentry from '@sentry/react-native';
 
 Sentry.init({ 
   dsn: 'https://3e67070f396b40c3b0f66f49c80e1d59@o514206.ingest.sentry.io/5617128',
-  enableNative: false,
+  enableNative: true,
 });
 
 
@@ -59,7 +59,11 @@ const App = () => {
           style={styles.scrollView}>
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <TextInput placeholder="Search a new city" onChangeText={text => setLocationInput(text)}/>	
+              <TextInput
+                placeholder="Search a new city"
+                maxLength={50}
+                onChangeText={text => setLocationInput(text)}
+              />	
               <Button title="Search" onPress={() => setLocation(locationInput)}>Search</Button>
             </View>
           </View>
