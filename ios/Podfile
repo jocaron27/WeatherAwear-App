@@ -10,6 +10,8 @@ target 'WeatherAwear' do
 
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
 
+  pod 'RNSentry', :path => '../node_modules/@sentry/react-native'
+
   target 'WeatherAwearTests' do
     inherit! :complete
     # Pods for testing

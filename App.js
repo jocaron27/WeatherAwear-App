@@ -20,6 +20,14 @@ import {
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { getWeather, clearOldWeatherCache } from './weather';
 
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({ 
+  dsn: 'https://3e67070f396b40c3b0f66f49c80e1d59@o514206.ingest.sentry.io/5617128',
+  enableNative: false,
+});
+
+
 const App = () => {
   const initialLocation = 'New York City'; // TODO: get user location
   const [locationInput, setLocationInput] = useState(initialLocation);
