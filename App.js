@@ -12,13 +12,15 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Button,
+  TouchableOpacity,
   TextInput,
   StatusBar,
+  Text,
 } from 'react-native';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { getWeather, clearOldWeatherCache } from './weather';
+import { Header } from './Header';
+import { Forecast } from './Forecast';
 
 import * as Sentry from '@sentry/react-native';
 
@@ -58,14 +60,23 @@ const App = () => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.body}>
-            <View style={styles.sectionContainer}>
+            <Header />
+            <View style={styles.searchContainer}>
               <TextInput
+                style={styles.input}
                 placeholder="Search a new city"
                 maxLength={50}
                 onChangeText={text => setLocationInput(text)}
               />	
-              <Button title="Search" onPress={() => setLocation(locationInput)}>Search</Button>
+              <TouchableOpacity
+                style={styles.button}
+                title="Search"
+                onPress={() => setLocation(locationInput)}
+              >
+                <Text style={styles.buttonText}>Search</Text>
+              </TouchableOpacity>
             </View>
+            <Forecast forecast={forecast} />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -74,42 +85,36 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
   body: {
-    backgroundColor: Colors.white,
+    backgroundColor: '#f2fdfb',
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  searchContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    paddingVertical: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
+  input: {
+    height: 45,
     fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '64%',
+    backgroundColor: 'white',
+    paddingLeft: 10,
   },
-  highlight: {
+  button: {
+    height: 45,
+    backgroundColor: '#ea6333',
+    paddingVertical: 14,
+    paddingHorizontal: 37,
+    flexGrow: 1,
+  },
+  buttonText: {
+    color: 'white',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
     fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+  }
 });
 
 export default App;
