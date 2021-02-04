@@ -18,7 +18,7 @@ export const Header = () => {
     return (
         <>
             <View style={styles.body}>
-                <Image style={styles.logo} source={require('./assets/umbrella.png')} />
+                <Image style={styles.logo} source={require('./assets/clothes/umbrella.png')} />
                 <Text style={styles.dark}>weather</Text>
                 <Text style={styles.light}>a</Text>
                 <Text style={styles.dark}>wear</Text>
