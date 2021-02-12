@@ -1,59 +1,79 @@
 import axios from 'axios';
 import * as mockData from './mockData.json';
 import { storeCacheData, getCacheData, getAllCacheKeys, clearCacheValue } from './cache';
+import Toast from 'react-native-simple-toast';
 
 const useMock = true;
 const useCache = false;
 
+const ANGLED_RAIN = require('./assets/weather/ANGLED_RAIN.png');
+const BIG_LITTLE_SNOW = require('./assets/weather/BIG_LITTLE_SNOW.png');
+const BIG_RAIN = require('./assets/weather/BIG_RAIN.png');
+const BIG_SNOW = require('./assets/weather/BIG_SNOW.png');
+const BLIZZARD = require('./assets/weather/BLIZZARD.png');
+const CLOUDY = require('./assets/weather/CLOUDY.png');
+const FOG = require('./assets/weather/FOG.png');
+const HAIL = require('./assets/weather/HAIL.png');
+const HEAVY_RAIN = require('./assets/weather/HEAVY_RAIN.png');
+const LIGHT_RAIN = require('./assets/weather/LIGHT_RAIN.png');
+const LIGHT_SNOW = require('./assets/weather/LIGHT_SNOW.png');
+const MED_RAIN = require('./assets/weather/MED_RAIN.png');
+const MED_SNOW = require('./assets/weather/MED_SNOW.png');
+const PARTLY_CLOUDY = require('./assets/weather/PARTLY_CLOUDY.png');
+const SNOW_WIND = require('./assets/weather/SNOW_WIND.png');
+const SUN = require('./assets/weather/SUN.png');
+const THUNDER = require('./assets/weather/THUNDER.png');
+const THUNDERSTORM = require('./assets/weather/THUNDERSTORM.png');
+
 const WeatherIcons = {
-    1000: require('./assets/weather/SUN.png'),
-    1003: require('./assets/weather/PARTLY_CLOUDY.png'),
-    1006: require('./assets/weather/CLOUDY.png'),
-    1009: require('./assets/weather/CLOUDY.png'),
-    1030: require('./assets/weather/BIG_RAIN.png'),
-    1063: require('./assets/weather/LIGHT_RAIN.png'),
-    1066: require('./assets/weather/LIGHT_SNOW.png'),
-    1069: require('./assets/weather/ANGLED_RAIN.png'),
-    1072: require('./assets/weather/LIGHT_RAIN.png'),
-    1087: require('./assets/weather/THUNDER.png'),
-    1114: require('./assets/weather/SNOW_WIND.png'),
-    1117: require('./assets/weather/BLIZZARD.png'),
-    1135: require('./assets/weather/FOG.png'),
-    1147: require('./assets/weather/FOG.png'),
-    1150: require('./assets/weather/LIGHT_RAIN.png'),
-    1153: require('./assets/weather/LIGHT_RAIN.png'),
-    1168: require('./assets/weather/LIGHT_RAIN.png'),
-    1171: require('./assets/weather/MED_RAIN.png'),
-    1180: require('./assets/weather/LIGHT_RAIN.png'),
-    1183: require('./assets/weather/LIGHT_RAIN.png'),
-    1186: require('./assets/weather/MED_RAIN.png'),
-    1189: require('./assets/weather/MED_RAIN.png'),
-    1192: require('./assets/weather/HEAVY_RAIN.png'),
-    1195: require('./assets/weather/HEAVY_RAIN.png'),
-    1198: require('./assets/weather/LIGHT_RAIN.png'),
-    1201: require('./assets/weather/LIGHT_RAIN.png'),
-    1204: require('./assets/weather/ANGLED_RAIN.png'),
-    1207: require('./assets/weather/ANGLED_RAIN.png'),
-    1210: require('./assets/weather/LIGHT_SNOW.png'),
-    1213: require('./assets/weather/MED_SNOW.png'),
-    1216: require('./assets/weather/MED_SNOW.png'),
-    1219: require('./assets/weather/MED_SNOW.png'),
-    1222: require('./assets/weather/MED_SNOW.png'),
-    1225: require('./assets/weather/BIG_LITTLE_SNOW.png'),
-    1237: require('./assets/weather/HAIL.png'),
-    1240: require('./assets/weather/LIGHT_RAIN.png'),
-    1243: require('./assets/weather/MED_RAIN.png'),
-    1246: require('./assets/weather/BIG_RAIN.png'),
-    1249: require('./assets/weather/ANGLED_RAIN.png'),
-    1252: require('./assets/weather/ANGLED_RAIN.png'),
-    1255: require('./assets/weather/LIGHT_SNOW.png'),
-    1258: require('./assets/weather/BIG_SNOW.png'),
-    1261: require('./assets/weather/HAIL.png'),
-    1264: require('./assets/weather/HAIL.png'),
-    1273: require('./assets/weather/THUNDERSTORM.png'),
-    1276: require('./assets/weather/THUNDERSTORM.png'),
-    1279: require('./assets/weather/LIGHT_SNOW.png'),
-    1282: require('./assets/weather/MED_SNOW.png'),
+    1000: SUN,
+    1003: PARTLY_CLOUDY,
+    1006: CLOUDY,
+    1009: CLOUDY,
+    1030: BIG_RAIN,
+    1063: LIGHT_RAIN,
+    1066: LIGHT_SNOW,
+    1069: ANGLED_RAIN,
+    1072: LIGHT_RAIN,
+    1087: THUNDER,
+    1114: SNOW_WIND,
+    1117: BLIZZARD,
+    1135: FOG,
+    1147: FOG,
+    1150: LIGHT_RAIN,
+    1153: LIGHT_RAIN,
+    1168: LIGHT_RAIN,
+    1171: MED_RAIN,
+    1180: LIGHT_RAIN,
+    1183: LIGHT_RAIN,
+    1186: MED_RAIN,
+    1189: MED_RAIN,
+    1192: HEAVY_RAIN,
+    1195: HEAVY_RAIN,
+    1198: LIGHT_RAIN,
+    1201: LIGHT_RAIN,
+    1204: ANGLED_RAIN,
+    1207: ANGLED_RAIN,
+    1210: LIGHT_SNOW,
+    1213: MED_SNOW,
+    1216: MED_SNOW,
+    1219: MED_SNOW,
+    1222: MED_SNOW,
+    1225: BIG_LITTLE_SNOW,
+    1237: HAIL,
+    1240: LIGHT_RAIN,
+    1243: MED_RAIN,
+    1246: BIG_RAIN,
+    1249: ANGLED_RAIN,
+    1252: ANGLED_RAIN,
+    1255: LIGHT_SNOW,
+    1258: BIG_SNOW,
+    1261: HAIL,
+    1264: HAIL,
+    1273: THUNDERSTORM,
+    1276: THUNDERSTORM,
+    1279: LIGHT_SNOW,
+    1282: MED_SNOW,
 }
 
 const snowCodes = {
@@ -145,13 +165,13 @@ export const getWeather = async ({ location = '' } ) => {
         .then(response => {
             console.log('res', response);
             if (response.error) {
-                console.error(error);
+                Toast.show('Unable to get weather data');
                 return null;
             }
             storeCacheData(cacheKey, response);
             return formatWeatherResponse(response);
         })
         .catch(error => {
-            console.error(error);
+            Toast.show('Unable to get weather data');
         });
 }
