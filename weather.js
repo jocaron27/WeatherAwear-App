@@ -2,9 +2,10 @@ import axios from 'axios';
 import * as mockData from './mockData.json';
 import { storeCacheData, getCacheData, getAllCacheKeys, clearCacheValue } from './cache';
 import Toast from 'react-native-simple-toast';
+import moment from 'moment';
 
-const useMock = true;
-const useCache = false;
+const useMock = false;
+const useCache = true;
 
 const ANGLED_RAIN = require('./assets/weather/ANGLED_RAIN.png');
 const BIG_LITTLE_SNOW = require('./assets/weather/BIG_LITTLE_SNOW.png');
@@ -109,14 +110,15 @@ const formatWeatherResponse = ({ data }) => {
     const { name, region, country } = location;
 
     return forecast.forecastday.map(({ day, date }) => {
+        const formattedDate = moment(date).format('LL').slice(0, -6);
         const code = day?.condition?.code || 1000;
         const type = getPrecipType(code);
         return {
             name,
             region,
             country,
-            date,
-            summary: day?.condition?.text,
+            date: formattedDate,
+            summary: day?.condition?.text?.toLowerCase(),
             icon: WeatherIcons[code],
             precip: type === 'SNOW' ? day.daily_chance_of_snow : day.daily_chance_of_rain,
             precipType: type === 'SNOW' ? 'snow' : 'rain',

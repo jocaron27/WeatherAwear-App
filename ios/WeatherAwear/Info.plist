@@ -55,15 +55,27 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>BarlowCondensed-Black.ttf</string>
-		<string>BarlowCondensed-Bold.ttf</string>
-		<string>BarlowCondensed-ExtraBold.ttf</string>
-		<string>BarlowCondensed-ExtraLight.ttf</string>
-		<string>BarlowCondensed-Light.ttf</string>
-		<string>BarlowCondensed-Medium.ttf</string>
-		<string>BarlowCondensed-Regular.ttf</string>
-		<string>BarlowCondensed-SemiBold.ttf</string>
-		<string>BarlowCondensed-Thin.ttf</string>
+		<string>Radley-Italic.ttf</string>
+		<string>Radley-Regular.ttf</string>
+		<string>Questrial-Regular.ttf</string>
+		<string>Poppins-Black.ttf</string>
+		<string>Poppins-BlackItalic.ttf</string>
+		<string>Poppins-Bold.ttf</string>
+		<string>Poppins-BoldItalic.ttf</string>
+		<string>Poppins-ExtraBold.ttf</string>
+		<string>Poppins-ExtraBoldItalic.ttf</string>
+		<string>Poppins-ExtraLight.ttf</string>
+		<string>Poppins-ExtraLightItalic.ttf</string>
+		<string>Poppins-Italic.ttf</string>
+		<string>Poppins-Light.ttf</string>
+		<string>Poppins-LightItalic.ttf</string>
+		<string>Poppins-Medium.ttf</string>
+		<string>Poppins-MediumItalic.ttf</string>
+		<string>Poppins-Regular.ttf</string>
+		<string>Poppins-SemiBold.ttf</string>
+		<string>Poppins-SemiBoldItalic.ttf</string>
+		<string>Poppins-Thin.ttf</string>
+		<string>Poppins-ThinItalic.ttf</string>
 	</array>
 </dict>
 </plist>

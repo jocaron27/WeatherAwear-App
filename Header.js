@@ -13,15 +13,16 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Colors } from './colors';
 
 export const Header = () => {
     return (
         <>
             <View style={styles.body}>
                 <Image style={styles.logo} source={require('./assets/clothes/umbrella.png')} />
-                <Text style={styles.dark}>weather</Text>
-                <Text style={styles.light}>a</Text>
-                <Text style={styles.dark}>wear</Text>
+                <Text style={[styles.name, styles.dark]}>weather</Text>
+                <Text style={[styles.name, styles.light]}>a</Text>
+                <Text style={[styles.name, styles.dark]}>wear</Text>
             </View>
         </>
     );
@@ -29,31 +30,27 @@ export const Header = () => {
 
 const styles = StyleSheet.create({
   body: {
-    backgroundColor: '#f2fdfb',
-    borderBottomColor: '#f3e95f',
-    borderBottomWidth: 4,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
+    padding: 12
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 35,
+    height: 35,
     marginRight: 10,
   },
+  name: {
+    fontSize: 18,
+    fontFamily: 'Radley-Regular',
+    lineHeight: 18
+  },
   dark: {
-    color: '#1a4a90',
-    fontSize: 50,
-    fontFamily: 'BarlowCondensed-Regular',
-    lineHeight: 50
+    color: Colors.lime, 
   },
   light: {
-    color: '#ed6856',
-    fontSize: 50,
-    fontFamily: 'BarlowCondensed-Regular',
-    lineHeight: 50
+    color: Colors.peach,
   },
 });
 
