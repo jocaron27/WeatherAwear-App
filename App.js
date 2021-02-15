@@ -17,13 +17,14 @@ import {
   StatusBar,
   Text,
   ImageBackground,
-  Dimensions
+  Dimensions,
 } from 'react-native'
 import { getWeather, clearOldWeatherCache } from './weather';
 import { storeCacheData, getCacheData } from './cache';
 import { Header } from './Header';
 import { Forecast } from './Forecast';
 import { Colors } from './colors';
+import { Carat } from './Carat';
 
 import * as Sentry from '@sentry/react-native';
 
@@ -41,6 +42,7 @@ const App = () => {
   const [forecast, setForecast] = useState([]);
   const [unit, setUnit] = useState(null);
   const [keyboard, setKeyboard] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getUnitPref();
@@ -72,8 +74,10 @@ const App = () => {
 
   useEffect(() => {
     console.log('location', location);
+    setLoading(true);
     getWeather({ location })
       .then(weather => {
+        setLoading(false);
         if (weather) setForecast(weather);
       });
   }, [location])
@@ -83,6 +87,7 @@ const App = () => {
   }, [forecast])
 
   console.log(viewportHeight)
+  const showBackground = !keyboard && viewportHeight > 600;
 
   return (
     <>
@@ -92,7 +97,7 @@ const App = () => {
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={styles.scrollView}>
             <ImageBackground
-                source={viewportHeight > 600 ? require('./assets/shapes/peachSwoosh.png') : null}
+                source={showBackground ? require('./assets/shapes/peachSwoosh.png') : null}
                 style={styles.body}
                 imageStyle={{
                   resizeMode: 'cover',
@@ -110,15 +115,16 @@ const App = () => {
                 </Text>
               </TouchableOpacity>
             </View>
+            {loading && <Text>Loading</Text>}
             {!keyboard && <Forecast forecast={forecast} unit={unit} />}
             <View style={styles.searchContainer}>
                 <TextInput
-                  style={styles.input}
+                  inlineImageLeft={keyboard || locationInput ? null : 'search'}
+                  inlineImagePadding={40}
+                  style={[styles.input, keyboard || locationInput ? styles.centerText : null]}
                   placeholder="Search a new city"
                   maxLength={50}
                   value={locationInput}
-                  // inlineImageLeft='search_icon'
-                  // inlineImagePadding
                   onChangeText={text => setLocationInput(text)}
                   onFocus={() => setKeyboard(true)}
                   onBlur={() => setKeyboard(false)}
@@ -140,9 +146,12 @@ const App = () => {
                   <Text style={styles.buttonText}>Search</Text>
                 </TouchableOpacity>}
             </View>
+            {!keyboard && <View style={styles.downCaratContainer}>
+              <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>Today's wearables</Text>
+              <Carat c={!showBackground ? 'white' : 'black'} w={12} />
+            </View>}
           </ImageBackground>
         </ScrollView>
-        
       </SafeAreaView>
     </>
   );
@@ -181,21 +190,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  centerText: {
+    textAlign: 'center',
+  },
   input: {
     height: 45,
     fontSize: 18,
     borderColor: 'black',
     borderWidth: 1,
     backgroundColor: Colors.lilac,
-    paddingLeft: 10,
     fontFamily: 'Questrial-Regular',
     color: Colors.black,
     fontSize: 15,
     height: 60,
-    textAlign: 'center',
     borderWidth: 0,
-    marginTop: viewportHeight / 32,
+    marginTop: viewportHeight / 6,
     flexGrow: 5,
+    paddingLeft: 15
   },
   button: {
     height: 45,
@@ -206,13 +217,27 @@ const styles = StyleSheet.create({
     marginLeft: 35,
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
-    marginTop: viewportHeight / 32
+    marginTop: viewportHeight / 6
   },
   buttonText: {
     color: Colors.purple4,
     textTransform: 'uppercase',
     fontFamily: 'Questrial-Regular'
   },
+  downCaratContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    paddingBottom: 18
+  },
+  contrast: {
+    color: Colors.white,
+  },
+  wearablesLink: {
+    fontFamily: 'Radley-Regular',
+    color: Colors.black,
+    fontSize: 17,
+    paddingBottom: 8
+  }
 });
 
 export default App;

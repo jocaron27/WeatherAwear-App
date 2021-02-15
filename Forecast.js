@@ -6,76 +6,77 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   Image,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from 'react-native';
 import { Colors } from './colors';
 
 const { height: viewportHeight } = Dimensions.get('window');
 
 export const Forecast = ({ forecast = [], unit = 'F' }) => {
+  const [idx, setIdx] = useState(0);
+
+  if (!forecast || !forecast[idx]) return null;
+
+  const day = forecast[idx];
+  const { date, name, region, country, summary, icon, precip, precipType, lo, hi } = day;
+
 
   return (
     <>
-      <View style={styles.body}>
-        {forecast.slice(0,1).map(day => {
-            const { date, name, region, country, summary, icon, precip, precipType, lo, hi } = day;
-            return (
-              <View key={date} style={styles.forecast}>
-                <View style={styles.dateSwitcher}>
-                  <View style={[styles.arrow, styles.arrowLeft]} />
-                  <Text style={styles.date}>{date}</Text>
-                  <View style={[styles.arrow, styles.arrowRight]} />
-                </View>
-                <Text style={styles.location}>{`${name}, ${region}, ${country}`}</Text>
-                <View style={styles.iconSummary}>
-                  <Image 
-                    source={icon} 
-                    style={styles.icon}
-                  />
-                  <View style={styles.info}>
-                    <View style={styles.temp}>
-                      <View style={styles.tempLabelContainer}>
-                        <Text style={[styles.tempLabel, styles.hi]}>High</Text>
-                        <Text style={[styles.tempLabel, styles.lo]}>Low</Text>
-                      </View>
-                      <View style={styles.tempValueContainer}>
-                        <Text style={[styles.tempValue, styles.hiVal]}>{`${unit === 'F' ? Math.round(hi) : Math.round((hi - 32) * (5 / 9))}°${unit}`}</Text>
-                        <Text style={[styles.tempValue, styles.loVal]}>{`${unit === 'F' ? Math.round(lo) : Math.round((lo - 32) * (5 / 9))}°${unit}`}</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.precip}>{`${precip}% chance of ${precipType}`}</Text>
-                  </View>
-                </View>
-                <Text style={styles.summary}>{summary}</Text>
+      <View style={styles.forecast}>
+        <View style={styles.dateSwitcher}>
+          <TouchableOpacity
+            style={[styles.arrow, styles.arrowLeft, idx < 1 ? styles.disabledLeft : null]}
+            onPress={() => setIdx(idx - 1)}
+            disabled={idx < 1}
+          />
+          <Text style={styles.date}>{date}</Text>
+          <TouchableOpacity
+            style={[styles.arrow, styles.arrowRight, idx + 1 >= forecast.length ? styles.disabledRight : null]}
+            onPress={() => setIdx(idx + 1)}
+            disabled={idx + 1 >= forecast.length}
+          />
+        </View>
+        <Text style={styles.location}>{`${name}, ${region}, ${country}`}</Text>
+        <View style={styles.iconSummary}>
+          <Image 
+            source={icon} 
+            style={styles.icon}
+          />
+          <View style={styles.info}>
+            <View style={styles.temp}>
+              <View style={styles.tempLabelContainer}>
+                <Text style={[styles.tempLabel, styles.hi]}>High</Text>
+                <Text style={[styles.tempLabel, styles.lo]}>Low</Text>
               </View>
-            )
-          }
-      )}
+              <View style={styles.tempValueContainer}>
+                <Text style={[styles.tempValue, styles.hiVal]}>{`${unit === 'F' ? Math.round(hi) : Math.round((hi - 32) * (5 / 9))}°${unit}`}</Text>
+                <Text style={[styles.tempValue, styles.loVal]}>{`${unit === 'F' ? Math.round(lo) : Math.round((lo - 32) * (5 / 9))}°${unit}`}</Text>
+              </View>
+            </View>
+            <Text style={styles.precip}>{`${precip}% chance of ${precipType}`}</Text>
+          </View>
+        </View>
+        <Text style={styles.summary}>{summary}</Text>
       </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flexGrow: 1,
-    height: '100%',
-    flex: 1
-  },
-  body: {
-    flexGrow: 1,
-    height: '100%',
-    flex: 1
-  },
   forecast: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    flexGrow: 1,
+    height: '100%',
+    flex: 1
   },
   dateSwitcher: {
     height: 30,
@@ -97,6 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 14,
+    marginBottom: viewportHeight > 600 ? 35 : 0,
   },
   precip: {
     color: Colors.white,
@@ -117,8 +119,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     width: 200,
     height: 250,
-    marginBottom: viewportHeight / 38,
-    marginLeft: 50
+    marginLeft: 50,
+    marginBottom: viewportHeight > 600 ? 15 : 0
   },
   info: {
     display: 'flex',
@@ -176,6 +178,12 @@ const styles = StyleSheet.create({
   },
   loVal: {
     textAlign: 'right',
+  },
+  disabledLeft: {
+    borderRightColor: Colors.navy,
+  },
+  disabledRight: {
+    borderLeftColor: Colors.navy,
   },
   arrow: {
     width: 0, 
