@@ -47,7 +47,9 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx }) => {
             disabled={idx + 1 >= forecast.length}
           />
         </View>
-        <Text style={styles.location}>{`${name}, ${region}, ${country}`}</Text>
+        <Text style={styles.location}>
+          {`${name}${region ? ', ' + region : ''}${country === 'United States of America' ? '' : ', ' + country}`}
+        </Text>
         <View style={styles.iconSummary}>
           <Image 
             source={icon} 
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
       textAlign: 'center',
       flexGrow: 2,
+      maxWidth: viewportWidth * .8
     },
     iconSummary: {
       display: 'flex',

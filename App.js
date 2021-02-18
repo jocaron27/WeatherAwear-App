@@ -21,7 +21,8 @@ import {
   Image,
   Animated,
   Easing,
-} from 'react-native'
+} from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import { getWeather, clearOldWeatherCache } from './weather';
 import { storeCacheData, getCacheData } from './cache';
 import { Header } from './Header';
@@ -49,7 +50,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [wearables, setWearables] = useState([]);
   const [idx, setIdx] = useState(0);
-  const showBackground = !keyboard && viewportHeight > 600;
+  const [appLoaded, setAppLoaded] = useState(false);
+  const showBackground = !keyboard && viewportHeight > 600 && appLoaded;
   const wearablesRef = useRef();
   const loadingAnim = new Animated.Value(0);
   Animated.loop(
@@ -57,8 +59,8 @@ const App = () => {
       loadingAnim,
       {
         toValue: 1,
-        duration: 6000,
-        useNativeDriver: false,
+        duration: 9000,
+        useNativeDriver: true,
         easing: Easing.linear
       }
     )
@@ -88,6 +90,7 @@ const App = () => {
   }
 
   useEffect(() => {
+    if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
     clearOldWeatherCache();
   }, []);
@@ -96,12 +99,15 @@ const App = () => {
     setLoading(true);
     getWeather({ location })
       .then(weather => {
-        setTimeout(() => setLoading(false), 500);
-        if (weather) {
-          if (!weather[idx]) setIdx(0);
-          setForecast(weather);
-          setWearables(weather[idx].wearables);
-        }
+        setTimeout(() => {
+          setLoading(false);
+          setAppLoaded(true);
+          if (weather) {
+            if (!weather[idx]) setIdx(0);
+            setForecast(weather);
+            setWearables(weather[idx].wearables);
+          }
+        }, 500)
       });
   }, [location])
 
@@ -120,7 +126,7 @@ const App = () => {
           showsVerticalScrollIndicator={false}
           ref={wearablesRef}
         >
-          <ImageBackground
+          {appLoaded ? <ImageBackground
             source={showBackground ? require('./assets/shapes/peachSwoosh.png') : null}
             style={styles.weather}
             imageStyle={{
@@ -191,8 +197,18 @@ const App = () => {
                   <Carat c={!showBackground ? 'white' : 'black'} w={12} />
               </TouchableOpacity>
             )}
-          </ImageBackground>
-          {!keyboard && !loading && wearables && !!wearables.length &&
+          </ImageBackground> :
+          <View style={styles.preAppLoader}>
+            <Animated.Image
+              style={{
+                transform: [{rotate: spin}], 
+                width: 200,
+                height: 200,
+              }}
+              source={require('./assets/weather/SUN.png')}
+            />
+          </View>}
+          {appLoaded && !keyboard && !loading && wearables && !!wearables.length &&
             (<View>
               <ImageBackground
                 source={showBackground ? require('./assets/shapes/peachSwooshFlipped.png') : null}
@@ -291,6 +307,13 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'flex-end',
       flexGrow: 3
+    },
+    preAppLoader: {
+      width: '100%',
+      height: viewportHeight,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     linkContainer: {
       display: 'flex',
