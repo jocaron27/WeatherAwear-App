@@ -11,7 +11,6 @@ import CaratBlack from './assets/icons/carat_black.svg';
 import CaratWhite from './assets/icons/carat_white.svg';
 
 export const Carat = ({ c, w }) => {
-    console.log(c);
     return (
         <>
             {c === 'white'

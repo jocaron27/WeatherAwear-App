@@ -1,10 +1,11 @@
 import axios from 'axios';
 import * as mockData from './mockData.json';
 import { storeCacheData, getCacheData, getAllCacheKeys, clearCacheValue } from './cache';
+import { getWearables } from './wearables';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 
-const useMock = false;
+const useMock = true;
 const useCache = true;
 
 const ANGLED_RAIN = require('./assets/weather/ANGLED_RAIN.png');
@@ -113,6 +114,8 @@ const formatWeatherResponse = ({ data }) => {
         const formattedDate = moment(date).format('LL').slice(0, -6);
         const code = day?.condition?.code || 1000;
         const type = getPrecipType(code);
+        const precip = type === 'SNOW' ? Number(day.daily_chance_of_snow) : Number(day.daily_chance_of_rain);
+        const precipType = type === 'SNOW' ? 'snow' : 'rain';
         return {
             name,
             region,
@@ -120,11 +123,16 @@ const formatWeatherResponse = ({ data }) => {
             date: formattedDate,
             summary: day?.condition?.text?.toLowerCase(),
             icon: WeatherIcons[code],
-            precip: type === 'SNOW' ? day.daily_chance_of_snow : day.daily_chance_of_rain,
-            precipType: type === 'SNOW' ? 'snow' : 'rain',
+            precip,
+            precipType,
             hi: day.maxtemp_f,
             lo: day.mintemp_f,
             avg: day.avgtemp_f,
+            wearables: getWearables({
+                hi: day.maxtemp_f,
+                precip,
+                precipType 
+            })
         };
     });
 };
