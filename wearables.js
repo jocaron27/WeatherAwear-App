@@ -95,17 +95,17 @@ const TEMP = {
   
 export const getWearables = (day) => {
     if (!day) return [];
-    const { hi, precip, precipType, summary } = day;
+    const { avg, precip, precipType, summary } = day;
     let wearables = [];
 
-    if (hi < 35) wearables = wearables.concat(TEMP.frigid);
-    else if (hi < 43) wearables = wearables.concat(TEMP.freezing)
-    else if (hi < 50) wearables = wearables.concat(TEMP.cold)
-    else if (hi < 60) wearables = wearables.concat(TEMP.chilly)
-    else if (hi < 70) wearables = wearables.concat(TEMP.mild)
-    else if (hi < 73) wearables = wearables.concat(TEMP.comfortable)
-    else if (hi < 80) wearables = wearables.concat(TEMP.warm)
-    else if (hi >= 80) wearables = wearables.concat(TEMP.hot)
+    if (avg < 35) wearables = wearables.concat(TEMP.frigid);
+    else if (avg < 43) wearables = wearables.concat(TEMP.freezing)
+    else if (avg < 50) wearables = wearables.concat(TEMP.cold)
+    else if (avg < 60) wearables = wearables.concat(TEMP.chilly)
+    else if (avg < 70) wearables = wearables.concat(TEMP.mild)
+    else if (avg < 73) wearables = wearables.concat(TEMP.comfortable)
+    else if (avg < 80) wearables = wearables.concat(TEMP.warm)
+    else if (avg >= 80) wearables = wearables.concat(TEMP.hot)
 
     
     if (precip > 20) wearables = wearables.concat(PRECIP[precipType])

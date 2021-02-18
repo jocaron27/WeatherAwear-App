@@ -19,6 +19,8 @@ import {
   ImageBackground,
   Dimensions,
   Image,
+  Animated,
+  Easing,
 } from 'react-native'
 import { getWeather, clearOldWeatherCache } from './weather';
 import { storeCacheData, getCacheData } from './cache';
@@ -35,6 +37,7 @@ Sentry.init({
 });
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
+const statusBarHeight = StatusBar.currentHeight;
 
 const App = () => {
   const initialLocation = 'New York City'; // TODO: get user location
@@ -45,13 +48,25 @@ const App = () => {
   const [keyboard, setKeyboard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [wearables, setWearables] = useState([]);
-  const [idx, setIdx] = useState(0)
-
+  const [idx, setIdx] = useState(0);
+  const showBackground = !keyboard && viewportHeight > 600;
   const wearablesRef = useRef();
-
-  useEffect(() => {
-    getUnitPref();
-  }, []);
+  const loadingAnim = new Animated.Value(0);
+  Animated.loop(
+    Animated.timing(
+      loadingAnim,
+      {
+        toValue: 1,
+        duration: 6000,
+        useNativeDriver: false,
+        easing: Easing.linear
+      }
+    )
+  ).start();
+  const spin = loadingAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+  })
 
   const getUnitPref = async () => {
     const pref = await getCacheData('unitPref');
@@ -73,6 +88,7 @@ const App = () => {
   }
 
   useEffect(() => {
+    getUnitPref();
     clearOldWeatherCache();
   }, []);
 
@@ -80,7 +96,7 @@ const App = () => {
     setLoading(true);
     getWeather({ location })
       .then(weather => {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 500);
         if (weather) {
           if (!weather[idx]) setIdx(0);
           setForecast(weather);
@@ -93,8 +109,6 @@ const App = () => {
     console.log('FORECAST: ', forecast);
     if (forecast[idx] && forecast[idx].wearables) setWearables(forecast[idx].wearables);
   }, [idx])
-
-  const showBackground = !keyboard && viewportHeight > 600;  
 
   return (
     <>
@@ -117,7 +131,7 @@ const App = () => {
               bottom: 0
             }}
           >
-            {!keyboard && <View style={styles.header}>
+            {!loading && !keyboard && <View style={styles.header}>
               <Header />
               <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
                 <Text style={styles.toggleText}>
@@ -125,8 +139,19 @@ const App = () => {
                 </Text>
               </TouchableOpacity>
             </View>}
-            {/* {loading && <Text>Loading</Text>} */}
-            {!keyboard && <Forecast forecast={forecast} unit={unit} updateIdx={setIdx} />}
+            {loading && !keyboard &&  (
+              <View style={styles.loader}>
+                <Animated.Image
+                  style={{
+                    transform: [{rotate: spin}], 
+                    width: 300,
+                    height: 300,
+                  }}
+                  source={require('./assets/weather/SUN.png')}
+                />
+              </View>
+            )}
+            {!keyboard && !loading && <Forecast forecast={forecast} unit={unit} updateIdx={setIdx} />}
             <View style={styles.searchContainer}>
               <TextInput
                 inlineImageLeft={keyboard || locationInput ? null : 'search'}
@@ -157,7 +182,7 @@ const App = () => {
                 </TouchableOpacity>)
               }
             </View>
-            {!keyboard && wearables && !!wearables.length && (
+            {!keyboard && !loading && wearables && !!wearables.length && (
               <TouchableOpacity
                 style={styles.linkContainer}
                 onPress={() => { wearablesRef.current.scrollTo({ y: viewportHeight + 10, animated: true }) }}
@@ -167,7 +192,7 @@ const App = () => {
               </TouchableOpacity>
             )}
           </ImageBackground>
-          {!keyboard && wearables && !!wearables.length &&
+          {!keyboard && !loading && wearables && !!wearables.length &&
             (<View>
               <ImageBackground
                 source={showBackground ? require('./assets/shapes/peachSwooshFlipped.png') : null}
@@ -203,7 +228,7 @@ const styles = StyleSheet.create({
   weather: {
     display: 'flex',
     flexDirection: 'column',
-    height: viewportHeight - 50,
+    height: viewportHeight - statusBarHeight,
   },
     header: {
       display: 'flex',
@@ -260,10 +285,17 @@ const styles = StyleSheet.create({
           textTransform: 'uppercase',
           fontFamily: 'Questrial-Regular'
         },
-    linkContainer: {
+    loader: {
+      width: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'flex-end',
+      flexGrow: 3
+    },
+    linkContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       flexGrow: 2
     },
       contrast: {

@@ -116,22 +116,25 @@ const formatWeatherResponse = ({ data }) => {
         const type = getPrecipType(code);
         const precip = type === 'SNOW' ? Number(day.daily_chance_of_snow) : Number(day.daily_chance_of_rain);
         const precipType = type === 'SNOW' ? 'snow' : 'rain';
+        const summary = day?.condition?.text?.toLowerCase();
+        const avg = day.avgtemp_f;
         return {
             name,
             region,
             country,
             date: formattedDate,
-            summary: day?.condition?.text?.toLowerCase(),
+            summary,
             icon: WeatherIcons[code],
             precip,
             precipType,
             hi: day.maxtemp_f,
             lo: day.mintemp_f,
-            avg: day.avgtemp_f,
+            avg,
             wearables: getWearables({
-                hi: day.maxtemp_f,
+                avg,
                 precip,
-                precipType 
+                precipType,
+                summary,
             })
         };
     });
@@ -175,6 +178,7 @@ export const getWeather = async ({ location = '' } ) => {
         .then(response => {
             console.log('res', response);
             if (response.error) {
+                console.log(response.error);
                 Toast.show('Unable to get weather data');
                 return null;
             }
@@ -182,6 +186,7 @@ export const getWeather = async ({ location = '' } ) => {
             return formatWeatherResponse(response);
         })
         .catch(error => {
+            console.log(error);
             Toast.show('Unable to get weather data');
         });
 }
