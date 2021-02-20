@@ -24,7 +24,7 @@ const MED_SNOW = require('./assets/weather/MED_SNOW.png');
 const PARTLY_CLOUDY = require('./assets/weather/PARTLY_CLOUDY.png');
 const SNOW_WIND = require('./assets/weather/SNOW_WIND.png');
 const SUN = require('./assets/weather/SUN.png');
-const THUNDER = require('./assets/weather/THUNDER.png');
+const THUNDER = require('./assets/weather/CLOUD_ZAP.png');
 const THUNDERSTORM = require('./assets/weather/THUNDERSTORM.png');
 
 const WeatherIcons = {

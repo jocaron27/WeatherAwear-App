@@ -30,25 +30,30 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx }) => {
 
   const day = forecast[idx];
   const { date, name, region, country, summary, icon, precip, precipType, lo, hi } = day;
+  const isUSA = country.includes('United States of America') || country.includes('USA');
 
   return (
     <>
       <View style={styles.forecast}>
         <View style={styles.dateSwitcher}>
           <TouchableOpacity
-            style={[styles.arrow, styles.arrowLeft, idx < 1 ? styles.disabledLeft : null]}
+            style={styles.arrowArea}
             onPress={() => setIdx(idx - 1)}
             disabled={idx < 1}
-          />
+          >
+            <View style={[styles.arrow, styles.arrowLeft, idx < 1 ? styles.disabledLeft : null]} />
+          </TouchableOpacity>
           <Text style={styles.date}>{date}</Text>
           <TouchableOpacity
-            style={[styles.arrow, styles.arrowRight, idx + 1 >= forecast.length ? styles.disabledRight : null]}
+            style={styles.arrowArea}
             onPress={() => setIdx(idx + 1)}
             disabled={idx + 1 >= forecast.length}
-          />
+          >
+            <View style={[styles.arrow, styles.arrowRight, idx + 1 >= forecast.length ? styles.disabledRight : null]} />
+          </TouchableOpacity>
         </View>
         <Text style={styles.location}>
-          {`${name}${region ? ', ' + region : ''}${country === 'United States of America' ? '' : ', ' + country}`}
+          {`${name}${region && isUSA ? ', ' + region : ''}${isUSA ? '' : ', ' + country}`}
         </Text>
         <View style={styles.iconSummary}>
           <Image 
@@ -85,6 +90,7 @@ const styles = StyleSheet.create({
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'center',
       flexGrow: 2
     },
       date: {
@@ -92,14 +98,21 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
         fontSize: 24,
         textAlign: 'center',
-        flexGrow: 1,
+        flexGrow: 10,
         lineHeight: 33
       },
       disabledLeft: {
-        borderRightColor: Colors.navy,
+        borderRightColor: 'transparent',
       },
       disabledRight: {
-        borderLeftColor: Colors.navy,
+        borderLeftColor: 'transparent',
+      },
+      arrowArea: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexGrow: 1,
+        minHeight: 30,
       },
       arrow: {
         width: 0, 

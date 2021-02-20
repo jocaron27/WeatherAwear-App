@@ -208,7 +208,7 @@ const App = () => {
               source={require('./assets/weather/SUN.png')}
             />
           </View>}
-          {appLoaded && !keyboard && !loading && wearables && !!wearables.length &&
+          {appLoaded && !keyboard &&
             (<View>
               <ImageBackground
                 source={showBackground ? require('./assets/shapes/peachSwooshFlipped.png') : null}
@@ -219,7 +219,7 @@ const App = () => {
                   width: viewportWidth
                 }}
               >
-                {wearables.map(wearable => (
+                {!loading && wearables && !!wearables.length && wearables.map(wearable => (
                   <View key={wearable.name} style={styles.wearable}>
                     <Image source={wearable.icon} style={styles.icon} />
                     <Text style={styles.wearableText}>{wearable.name}</Text>
