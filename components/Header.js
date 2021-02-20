@@ -13,13 +13,13 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Colors } from './colors';
+import { Colors } from '../config/colors';
 
 export const Header = () => {
     return (
         <>
             <View style={styles.body}>
-                <Image style={styles.logo} source={require('./assets/clothes/umbrella.png')} />
+                <Image style={styles.logo} source={require('../assets/clothes/umbrella.png')} />
                 <Text style={[styles.name, styles.dark]}>weather</Text>
                 <Text style={[styles.name, styles.light]}>a</Text>
                 <Text style={[styles.name, styles.dark]}>wear</Text>

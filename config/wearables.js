@@ -1,79 +1,79 @@
 const clothes = {
     umbrella: {
         name: 'umbrella',
-        icon: require('./assets/clothes/umbrella.png')
+        icon: require('../assets/clothes/umbrella.png')
     }, 
     rainboots: {
         name: 'rainboots',
-        icon: require('./assets/clothes/rainboots.png')
+        icon: require('../assets/clothes/rainboots.png')
     }, 
     raincoat: {
         name: 'raincoat',
-        icon: require('./assets/clothes/raincoat.png')
+        icon: require('../assets/clothes/raincoat.png')
     }, 
     sunglasses: {
         name: 'sunglasses',
-        icon: require('./assets/clothes/sunglasses.png')
+        icon: require('../assets/clothes/sunglasses.png')
     }, 
     thickjacket: {
         name: 'thick jacket',
-        icon: require('./assets/clothes/thickjacket.png')
+        icon: require('../assets/clothes/thickjacket.png')
     }, 
     mediumjacket: {
         name: 'medium jacket',
-        icon: require('./assets/clothes/mediumjacket.png')
+        icon: require('../assets/clothes/mediumjacket.png')
     }, 
     lightjacket: {
         name: 'light jacket',
-        icon: require('./assets/clothes/lightjacket.png')
+        icon: require('../assets/clothes/lightjacket.png')
     }, 
     sweater: {
         name: 'sweater',
-        icon: require('./assets/clothes/sweater.png')
+        icon: require('../assets/clothes/sweater.png')
     }, 
     longpants: {
         name: 'long pants',
-        icon: require('./assets/clothes/longpants.png')
+        icon: require('../assets/clothes/longpants.png')
     }, 
     shorts: {
         name: 'shorts',
-        icon: require('./assets/clothes/shorts.png')
+        icon: require('../assets/clothes/shorts.png')
     },
     skirt: {
         name: 'skirt',
-        icon: require('./assets/clothes/skirt.png')
+        icon: require('../assets/clothes/skirt.png')
     },
     gloves: {
         name: 'gloves',
-        icon: require('./assets/clothes/gloves.png')
+        icon: require('../assets/clothes/gloves.png')
     },
     hat: {
         name: 'hat',
-        icon: require('./assets/clothes/hat.png')
+        icon: require('../assets/clothes/hat.png')
     }, 
     tshirt: {
         name: 't-shirt',
-        icon: require('./assets/clothes/tshirt.png')
+        icon: require('../assets/clothes/tshirt.png')
     },
     sleevelessshirt: {
         name: 'sleeveless shirt',
-        icon: require('./assets/clothes/sleeveless.png')
+        icon: require('../assets/clothes/sleeveless.png')
     }, 
     sandals: {
         name: 'sandals',
-        icon: require('./assets/clothes/sandals.png')
+        icon: require('../assets/clothes/sandals.png')
     }, 
     dress: {
         name: 'dress',
-        icon: require('./assets/clothes/dress.png')
+        icon: require('../assets/clothes/dress.png')
     }, 
     scarf: {
         name: 'scarf',
-        icon: require('./assets/clothes/scarf.png')
+        icon: require('../assets/clothes/scarf.png')
     },
     snowboots: {
         name: 'snow boots',
-        icon: require('./assets/clothes/rainboots.png')
+        icon: require('../assets/clothes/rainboots.png')
     }
 };
 

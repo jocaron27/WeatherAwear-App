@@ -23,11 +23,12 @@ import {
   Easing,
 } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
-import { getWeather, clearOldWeatherCache } from './weather';
-import { storeCacheData, getCacheData } from './cache';
+import GestureRecognizer from 'react-native-swipe-gestures';
+import { getWeather, clearOldWeatherCache } from '../config/weather';
+import { storeCacheData, getCacheData } from '../config/cache';
 import { Header } from './Header';
 import { Forecast } from './Forecast';
-import { Colors } from './colors';
+import { Colors } from '../config/colors';
 import { Carat } from './Carat';
 
 import * as Sentry from '@sentry/react-native';
@@ -41,6 +42,8 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window'
 const statusBarHeight = StatusBar.currentHeight;
 
 const App = () => {
+  const [appWidth, setAppWidth] = useState(viewportWidth);
+  const [appHeight, setAppHeight] = useState(viewportHeight);
   const initialLocation = 'New York City'; // TODO: get user location
   const [locationInput, setLocationInput] = useState('');
   const [location, setLocation] = useState(initialLocation);
@@ -89,6 +92,19 @@ const App = () => {
     setUnitPref(newPref);
   }
 
+  const decreaseIdx = () => {
+    if (idx > 0) setIdx(idx - 1);
+  }
+
+  const increaseIdx = () => {
+    if (idx < forecast.length - 1) setIdx(idx + 1);
+  }
+
+  const onLayout = (e) => {
+    if (e?.nativeEvent?.layout?.width) setAppWidth(e.nativeEvent.layout.width);
+    // if (e?.nativeEvent?.layout?.height) setAppWidth(e.nativeEvent.layout.height);
+  }
+
   useEffect(() => {
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
@@ -103,6 +119,7 @@ const App = () => {
           setLoading(false);
           setAppLoaded(true);
           if (weather) {
+            console.log(weather);
             if (!weather[idx]) setIdx(0);
             setForecast(weather);
             setWearables(weather[idx].wearables);
@@ -112,7 +129,6 @@ const App = () => {
   }, [location])
 
   useEffect(() => {
-    console.log('FORECAST: ', forecast);
     if (forecast[idx] && forecast[idx].wearables) setWearables(forecast[idx].wearables);
   }, [idx])
 
@@ -120,116 +136,123 @@ const App = () => {
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          ref={wearablesRef}
+        <GestureRecognizer
+          onSwipeRight={decreaseIdx}
+          onSwipeLeft={increaseIdx}
         >
-          {appLoaded ? <ImageBackground
-            source={showBackground ? require('./assets/shapes/peachSwoosh.png') : null}
-            style={styles.weather}
-            imageStyle={{
-              resizeMode: 'cover',
-              height: viewportHeight / (viewportHeight / viewportWidth + .5),
-              width: viewportWidth,
-              top: undefined,
-              bottom: 0
-            }}
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+            ref={wearablesRef}
+            onLayout={onLayout}
           >
-            {!loading && !keyboard && <View style={styles.header}>
-              <Header />
-              <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
-                <Text style={styles.toggleText}>
-                  {`switch to ${unit === 'F' ? 'Celcius' : 'Fahrenheit'}`}
-                </Text>
-              </TouchableOpacity>
-            </View>}
-            {loading && !keyboard &&  (
-              <View style={styles.loader}>
-                <Animated.Image
-                  style={{
-                    transform: [{rotate: spin}], 
-                    width: 300,
-                    height: 300,
-                  }}
-                  source={require('./assets/weather/SUN.png')}
-                />
-              </View>
-            )}
-            {!keyboard && !loading && <Forecast forecast={forecast} unit={unit} updateIdx={setIdx} />}
-            <View style={styles.searchContainer}>
-              <TextInput
-                inlineImageLeft={keyboard || locationInput ? null : 'search'}
-                inlineImagePadding={40}
-                style={[styles.input, keyboard || locationInput ? styles.centerText : null]}
-                placeholder="Search a new city"
-                maxLength={50}
-                value={locationInput}
-                onChangeText={text => setLocationInput(text)}
-                onFocus={() => setKeyboard(true)}
-                onBlur={() => setKeyboard(false)}
-                onSubmitEditing={() => {
-                  setLocation(locationInput);
-                  setLocationInput('');
-                }}
-              />	
-              {!keyboard &&
-                (<TouchableOpacity
-                  style={styles.button}
-                  title="Search"
-                  onPress={() => {
+            {appLoaded ? <ImageBackground
+              source={showBackground ? require('../assets/shapes/peachSwoosh.png') : null}
+              style={styles.weather}
+              imageStyle={{
+                resizeMode: 'cover',
+                height: viewportHeight / (viewportHeight / appWidth + .5),
+                width: appWidth,
+                top: undefined,
+                bottom: 0
+              }}
+            >
+              {!loading && !keyboard && <View style={styles.header}>
+                <Header />
+                <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
+                  <Text style={styles.toggleText}>
+                    {`switch to ${unit === 'F' ? 'Celcius' : 'Fahrenheit'}`}
+                  </Text>
+                </TouchableOpacity>
+              </View>}
+              {loading && !keyboard &&  (
+                <View style={styles.loader}>
+                  <Animated.Image
+                    style={{
+                      transform: [{rotate: spin}], 
+                      width: 200,
+                      height: 200,
+                    }}
+                    source={require('../assets/weather/SUN.png')}
+                  />
+                </View>
+              )}
+              {!keyboard && !loading && <Forecast forecast={forecast} unit={unit} updateIdx={setIdx} idx={idx} />}
+              <View style={styles.searchContainer}>
+                <TextInput
+                  inlineImageLeft={keyboard || locationInput ? null : 'search'}
+                  inlineImagePadding={40}
+                  style={[styles.input, keyboard || locationInput ? styles.centerText : null]}
+                  placeholder="Search a new city"
+                  maxLength={50}
+                  value={locationInput}
+                  onChangeText={text => setLocationInput(text)}
+                  onFocus={() => setKeyboard(true)}
+                  onBlur={() => setKeyboard(false)}
+                  onSubmitEditing={() => {
                     setLocation(locationInput);
                     setLocationInput('');
                   }}
-                  disabled={!locationInput}
+                  returnKeyType='search'
+                />	
+                {!keyboard &&
+                  (<TouchableOpacity
+                    style={styles.button}
+                    title="Search"
+                    onPress={() => {
+                      setLocation(locationInput);
+                      setLocationInput('');
+                    }}
+                    disabled={!locationInput}
+                  >
+                    <Text style={styles.buttonText}>Search</Text>
+                  </TouchableOpacity>)
+                }
+              </View>
+              {!keyboard && !loading && wearables && !!wearables.length && (
+                <TouchableOpacity
+                  style={styles.linkContainer}
+                  onPress={() => { wearablesRef.current.scrollTo({ y: viewportHeight + 10, animated: true }) }}
                 >
-                  <Text style={styles.buttonText}>Search</Text>
-                </TouchableOpacity>)
-              }
-            </View>
-            {!keyboard && !loading && wearables && !!wearables.length && (
-              <TouchableOpacity
-                style={styles.linkContainer}
-                onPress={() => { wearablesRef.current.scrollTo({ y: viewportHeight + 10, animated: true }) }}
-              >
-                <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>Today's wearables</Text>
-                  <Carat c={!showBackground ? 'white' : 'black'} w={12} />
-              </TouchableOpacity>
-            )}
-          </ImageBackground> :
-          <View style={styles.preAppLoader}>
-            <Animated.Image
-              style={{
-                transform: [{rotate: spin}], 
-                width: 200,
-                height: 200,
-              }}
-              source={require('./assets/weather/SUN.png')}
-            />
-          </View>}
-          {appLoaded && !keyboard &&
-            (<View>
-              <ImageBackground
-                source={showBackground ? require('./assets/shapes/peachSwooshFlipped.png') : null}
-                style={styles.wearablesView}
-                imageStyle={{
-                  resizeMode: 'cover',
-                  height: viewportHeight / (viewportHeight / viewportWidth + .5),
-                  width: viewportWidth
+                  <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>Today's wearables</Text>
+                    <Carat c={!showBackground ? 'white' : 'black'} w={12} />
+                </TouchableOpacity>
+              )}
+            </ImageBackground> :
+            <View style={styles.preAppLoader}>
+              <Animated.Image
+                style={{
+                  transform: [{rotate: spin}], 
+                  width: 200,
+                  height: 200,
                 }}
-              >
-                {!loading && wearables && !!wearables.length && wearables.map(wearable => (
-                  <View key={wearable.name} style={styles.wearable}>
-                    <Image source={wearable.icon} style={styles.icon} />
-                    <Text style={styles.wearableText}>{wearable.name}</Text>
-                  </View>
-                ))}
-              </ImageBackground>
-              <Text style={styles.footer}>an app by jeannecastillo.com</Text>
-            </View>)
-          }
-        </ScrollView>
+                source={require('../assets/weather/SUN.png')}
+              />
+            </View>}
+            {appLoaded && !keyboard &&
+              (<View>
+                <ImageBackground
+                  source={showBackground ? require('../assets/shapes/peachSwooshFlipped.png') : null}
+                  style={styles.wearablesView}
+                  imageStyle={{
+                    resizeMode: 'cover',
+                    height: viewportHeight / (viewportHeight / appWidth + .5),
+                    width: appWidth
+                  }}
+                >
+                  {!loading && wearables && !!wearables.length && wearables.map(wearable => (
+                    <View key={wearable.name} style={styles.wearable}>
+                      <Image source={wearable.icon} style={styles.icon} />
+                      <Text style={styles.wearableText}>{wearable.name}</Text>
+                    </View>
+                  ))}
+                </ImageBackground>
+                <Text style={styles.footer}>an app by jeannecastillo.com</Text>
+              </View>)
+            }
+          </ScrollView>
+        </GestureRecognizer>
       </SafeAreaView>
     </>
   );
@@ -306,7 +329,7 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'flex-end',
-      flexGrow: 3
+      flexGrow: 5
     },
     preAppLoader: {
       width: '100%',

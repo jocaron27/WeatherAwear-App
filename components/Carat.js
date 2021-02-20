@@ -7,8 +7,8 @@
  */
 
 import React from 'react';
-import CaratBlack from './assets/icons/carat_black.svg';
-import CaratWhite from './assets/icons/carat_white.svg';
+import CaratBlack from '../assets/icons/carat_black.svg';
+import CaratWhite from '../assets/icons/carat_white.svg';
 
 export const Carat = ({ c, w }) => {
     return (

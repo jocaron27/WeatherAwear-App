@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -15,17 +15,11 @@ import {
   Dimensions,
   TouchableOpacity
 } from 'react-native';
-import { Colors } from './colors';
+import { Colors } from '../config/colors';
 
 const { height: viewportHeight, width: viewportWidth } = Dimensions.get('window');
 
-export const Forecast = ({ forecast = [], unit = 'F', updateIdx }) => {
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    updateIdx(idx);
-  }, [idx])
-
+export const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
   if (!forecast || !forecast[idx]) return null;
 
   const day = forecast[idx];
@@ -38,7 +32,7 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx }) => {
         <View style={styles.dateSwitcher}>
           <TouchableOpacity
             style={styles.arrowArea}
-            onPress={() => setIdx(idx - 1)}
+            onPress={() => updateIdx(idx - 1)}
             disabled={idx < 1}
           >
             <View style={[styles.arrow, styles.arrowLeft, idx < 1 ? styles.disabledLeft : null]} />
@@ -46,7 +40,7 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx }) => {
           <Text style={styles.date}>{date}</Text>
           <TouchableOpacity
             style={styles.arrowArea}
-            onPress={() => setIdx(idx + 1)}
+            onPress={() => updateIdx(idx + 1)}
             disabled={idx + 1 >= forecast.length}
           >
             <View style={[styles.arrow, styles.arrowRight, idx + 1 >= forecast.length ? styles.disabledRight : null]} />

@@ -8,24 +8,24 @@ import moment from 'moment';
 const useMock = true;
 const useCache = true;
 
-const ANGLED_RAIN = require('./assets/weather/ANGLED_RAIN.png');
-const BIG_LITTLE_SNOW = require('./assets/weather/BIG_LITTLE_SNOW.png');
-const BIG_RAIN = require('./assets/weather/BIG_RAIN.png');
-const BIG_SNOW = require('./assets/weather/BIG_SNOW.png');
-const BLIZZARD = require('./assets/weather/BLIZZARD.png');
-const CLOUDY = require('./assets/weather/CLOUDY.png');
-const FOG = require('./assets/weather/FOG.png');
-const HAIL = require('./assets/weather/HAIL.png');
-const HEAVY_RAIN = require('./assets/weather/HEAVY_RAIN.png');
-const LIGHT_RAIN = require('./assets/weather/LIGHT_RAIN.png');
-const LIGHT_SNOW = require('./assets/weather/LIGHT_SNOW.png');
-const MED_RAIN = require('./assets/weather/MED_RAIN.png');
-const MED_SNOW = require('./assets/weather/MED_SNOW.png');
-const PARTLY_CLOUDY = require('./assets/weather/PARTLY_CLOUDY.png');
-const SNOW_WIND = require('./assets/weather/SNOW_WIND.png');
-const SUN = require('./assets/weather/SUN.png');
-const THUNDER = require('./assets/weather/CLOUD_ZAP.png');
-const THUNDERSTORM = require('./assets/weather/THUNDERSTORM.png');
+const ANGLED_RAIN = require('../assets/weather/ANGLED_RAIN.png');
+const BIG_LITTLE_SNOW = require('../assets/weather/BIG_LITTLE_SNOW.png');
+const BIG_RAIN = require('../assets/weather/BIG_RAIN.png');
+const BIG_SNOW = require('../assets/weather/BIG_SNOW.png');
+const BLIZZARD = require('../assets/weather/BLIZZARD.png');
+const CLOUDY = require('../assets/weather/CLOUDY.png');
+const FOG = require('../assets/weather/FOG.png');
+const HAIL = require('../assets/weather/HAIL.png');
+const HEAVY_RAIN = require('../assets/weather/HEAVY_RAIN.png');
+const LIGHT_RAIN = require('../assets/weather/LIGHT_RAIN.png');
+const LIGHT_SNOW = require('../assets/weather/LIGHT_SNOW.png');
+const MED_RAIN = require('../assets/weather/MED_RAIN.png');
+const MED_SNOW = require('../assets/weather/MED_SNOW.png');
+const PARTLY_CLOUDY = require('../assets/weather/PARTLY_CLOUDY.png');
+const SNOW_WIND = require('../assets/weather/SNOW_WIND.png');
+const SUN = require('../assets/weather/SUN.png');
+const THUNDER = require('../assets/weather/CLOUD_ZAP.png');
+const THUNDERSTORM = require('../assets/weather/THUNDERSTORM.png');
 
 const WeatherIcons = {
     1000: SUN,
