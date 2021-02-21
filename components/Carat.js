@@ -5,18 +5,19 @@
  * @format
  * @flow strict-local
  */
-
 import React from 'react';
 import CaratBlack from '../assets/icons/carat_black.svg';
 import CaratWhite from '../assets/icons/carat_white.svg';
 
-export const Carat = ({ c, w }) => {
-    return (
-        <>
-            {c === 'white'
-                ? <CaratWhite width={w} />
-                : <CaratBlack width={w} />
-            }
-        </>
-    )
+const Carat = ({ c, w }) => {
+return (
+    <>
+        {c === 'white'
+            ? <CaratWhite width={w} />
+            : <CaratBlack width={w} />
+        }
+    </>
+)
 }
+
+export default Carat;

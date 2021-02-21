@@ -5,52 +5,47 @@
  * @format
  * @flow strict-local
  */
-
 import React from 'react';
 import {
   StyleSheet,
-  Image,
-  Text,
   View,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
+import { Logo } from './Logo';
 import { Colors } from '../config/colors';
 
-export const Header = () => {
-    return (
-        <>
-            <View style={styles.body}>
-                <Image style={styles.logo} source={require('../assets/clothes/umbrella.png')} />
-                <Text style={[styles.name, styles.dark]}>weather</Text>
-                <Text style={[styles.name, styles.light]}>a</Text>
-                <Text style={[styles.name, styles.dark]}>wear</Text>
-            </View>
-        </>
-    );
+const Header = ({ unit, toggleUnitPref }) => {
+
+  return (
+    <View style={styles.header}>
+      <Logo />
+      <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
+        <Text style={styles.toggleText}>
+          {`switch to ${unit === 'F' ? 'Celcius' : 'Fahrenheit'}`}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-  body: {
+  header: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexGrow: 1,
+  },
+  toggle: {
+    display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 12
+    paddingRight: 20
   },
-  logo: {
-    width: 35,
-    height: 35,
-    marginRight: 10,
-  },
-  name: {
-    fontSize: 18,
-    fontFamily: 'Radley-Regular',
-    lineHeight: 18
-  },
-  dark: {
-    color: Colors.lime, 
-  },
-  light: {
-    color: Colors.peach,
+  toggleText: { 
+    color: Colors.white,
+    fontFamily: 'Questrial-Regular',
+    fontSize: 11,
+    lineHeight: 11,
   },
 });
 

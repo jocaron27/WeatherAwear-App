@@ -19,7 +19,7 @@ import { Colors } from '../config/colors';
 
 const { height: viewportHeight, width: viewportWidth } = Dimensions.get('window');
 
-export const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
+const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
   if (!forecast || !forecast[idx]) return null;
 
   const day = forecast[idx];
@@ -35,7 +35,11 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
             onPress={() => updateIdx(idx - 1)}
             disabled={idx < 1}
           >
-            <View style={[styles.arrow, styles.arrowLeft, idx < 1 ? styles.disabledLeft : null]} />
+            <View style={[
+              styles.arrow,
+              styles.arrowLeft,
+              idx < 1 ? styles.disabledLeft : null
+            ]} />
           </TouchableOpacity>
           <Text style={styles.date}>{date}</Text>
           <TouchableOpacity
@@ -43,7 +47,11 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
             onPress={() => updateIdx(idx + 1)}
             disabled={idx + 1 >= forecast.length}
           >
-            <View style={[styles.arrow, styles.arrowRight, idx + 1 >= forecast.length ? styles.disabledRight : null]} />
+            <View style={[
+              styles.arrow, 
+              styles.arrowRight,
+              idx + 1 >= forecast.length ? styles.disabledRight : null
+            ]} />
           </TouchableOpacity>
         </View>
         <Text style={styles.location}>
@@ -61,8 +69,12 @@ export const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
                 <Text style={[styles.tempLabel, styles.lo]}>Low</Text>
               </View>
               <View style={styles.tempValueContainer}>
-                <Text style={[styles.tempValue, styles.hiVal]}>{`${unit === 'F' ? Math.round(hi) : Math.round((hi - 32) * (5 / 9))}°${unit}`}</Text>
-                <Text style={[styles.tempValue, styles.loVal]}>{`${unit === 'F' ? Math.round(lo) : Math.round((lo - 32) * (5 / 9))}°${unit}`}</Text>
+                <Text style={[styles.tempValue, styles.hiVal]}>
+                  {`${unit === 'F' ? Math.round(hi) : Math.round((hi - 32) * (5 / 9))}°${unit}`}
+                </Text>
+                <Text style={[styles.tempValue, styles.loVal]}>
+                  {`${unit === 'F' ? Math.round(lo) : Math.round((lo - 32) * (5 / 9))}°${unit}`}
+                </Text>
               </View>
             </View>
             <Text style={styles.precip}>{`${precip}% chance of ${precipType}`}</Text>
