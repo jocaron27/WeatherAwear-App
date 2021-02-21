@@ -207,13 +207,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    flexGrow: 5
+    flexGrow: 6
   },
   linkContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    flexGrow: 2
+    flexGrow: 1
   },
   wearablesLink: {
     fontFamily: 'Radley-Regular',
