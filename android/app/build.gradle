@@ -133,6 +133,7 @@ android {
         applicationId "com.weatherawear"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
     }
@@ -192,6 +193,8 @@ dependencies {
 
     implementation project(':react-native-svg')
 
+    implementation "androidx.multidex:multidex:2.0.1"
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }
@@ -221,6 +224,8 @@ dependencies {
     // For WebP support, including animated WebP
     compile 'com.facebook.fresco:animated-webp:1.+'
     compile 'com.facebook.fresco:webpsupport:1.+' 
+
+    // compile project(':react-native-admob')
 }
 
 // Run this once to be able to run the application with BUCK

@@ -5,7 +5,7 @@
  * @format
  * @flow strict-local
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,12 +14,28 @@ import {
   Text,
 } from 'react-native';
 import { Colors } from '../config/colors';
+import BannerAd from './BannerAd';
 
 const Search = ({ setLocation, keyboard, setKeyboard }) => {
   const [locationInput, setLocationInput] = useState('');
+  const [showAd, setShowAd] = useState(false);
+  const [timer, setTimer] = useState(null);
+
+  useEffect(() => {
+    if (keyboard) setTimer(setTimeout(() => setShowAd(true), 2000));
+    if (!keyboard) {
+      clearTimeout(timer);
+      setShowAd(false);
+    }
+  }, [keyboard]);
 
   return (
     <View style={styles.searchContainer}>
+      {keyboard && showAd && (
+        <View style={styles.ad}>
+          <BannerAd location='search' size='mediumRectangle' />
+        </View>
+      )}
       <TextInput
         inlineImageLeft={keyboard || locationInput ? null : 'search'}
         inlineImagePadding={40}
@@ -35,7 +51,7 @@ const Search = ({ setLocation, keyboard, setKeyboard }) => {
           setLocationInput('');
         }}
         returnKeyType='search'
-      />	
+      />
       {!keyboard &&
         (<TouchableOpacity
           style={styles.button}
@@ -54,6 +70,11 @@ const Search = ({ setLocation, keyboard, setKeyboard }) => {
 };
 
 const styles = StyleSheet.create({
+  ad: {
+    position: 'absolute',
+    top: 40,
+    width: '100%'
+  },
   searchContainer: {
     width: '100%',
     display: 'flex',

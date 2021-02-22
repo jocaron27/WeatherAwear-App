@@ -18,6 +18,8 @@ target 'WeatherAwear' do
 
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
+  pod 'react-native-admob', :path => '../node_modules/react-native-admob'
+
   target 'WeatherAwearTests' do
     inherit! :complete
     # Pods for testing

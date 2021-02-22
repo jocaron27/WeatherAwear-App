@@ -5,7 +5,7 @@
  * @format
  * @flow strict-local
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,6 +15,8 @@ import {
   ImageBackground,
   Dimensions,
 } from 'react-native';
+
+import { AdMobInterstitial } from 'react-native-admob';
 
 import SplashScreen from 'react-native-splash-screen';
 import GestureRecognizer from 'react-native-swipe-gestures';
@@ -30,12 +32,15 @@ import Footer from './Footer';
 import Loader from './Loader';
 import Search from './Search';
 import Wearables from './Wearables';
+import BannerAd from './BannerAd';
 
-const { height: viewportHeight } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
+const viewportHeight = Math.max(height, width);
 const statusBarHeight = StatusBar.currentHeight;
 
 const Main = ({
-  appWidth,
+  portraitHeight,
+  currentWidth,
   scrollToWearables,
 }) => {
   // LOCATION
@@ -52,11 +57,26 @@ const Main = ({
   const [forecast, setForecast] = useState([]);
   const [wearables, setWearables] = useState([]);
   // SHOW/HIDE LOGIC
-  const showBackground = !keyboard && viewportHeight > 600;
+  const showBackground = !keyboard && portraitHeight > 600;
   const showLoader = loading && !keyboard;
   const loadedNoKeyboard = !loading && !keyboard;
   const showForecast = loadedNoKeyboard;
   const showWearables = loadedNoKeyboard && wearables && !!wearables.length;
+  // ADS
+  const adRef = useRef();
+  const locChangeAdFrequency = 2;
+  const [locCount, setlocCount] = useState(1);
+  const popupAdLimit = 1;
+  const [popupAdCount, setPopupAdCount] = useState(0);
+  const showPopupAd = () => {
+    if (popupAdCount <  popupAdLimit)
+      AdMobInterstitial?.requestAd()
+        .then(() => {
+          AdMobInterstitial?.showAd();
+          setPopupAdCount(popupAdCount + 1);
+        })
+        .catch(() => {})
+  };
 
   // Unit Pref methods
   const getUnitPref = async () => {
@@ -92,7 +112,13 @@ const Main = ({
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
     clearOldWeatherCache();
+    AdMobInterstitial.setAdUnitID('ca-app-pub-9279593135031162/7046496130');
+    AdMobInterstitial.setTestDevices(['07307a5d-b6b3-4c93-85ad-d905168c26fa']);
   }, []);
+
+  useEffect(() => {
+    if (adRef.loadBanner) adRef.loadBanner();
+  }, [adRef]);
 
   // Fetch
   useEffect(() => {
@@ -102,6 +128,7 @@ const Main = ({
         setTimeout(() => {
           setLoading(false);
           setAppLoaded(true);
+          if (location !== initialLocation) setlocCount(locCount + 1)
           if (weather) {
             console.log(weather);
             if (!weather[idx]) setIdx(0);
@@ -115,7 +142,18 @@ const Main = ({
   // Display wearables
   useEffect(() => {
     if (forecast[idx] && forecast[idx].wearables) setWearables(forecast[idx].wearables);
+    // Show ad on last day of forecast
+    if (idx === forecast.length - 1) {
+      showPopupAd();
+    }
   }, [idx]);
+
+  // Show add on the (locChangeAdFrequency)th location
+  useEffect(() => {
+    if (locCount > 0 && locCount % locChangeAdFrequency === 0) {
+      showPopupAd();
+    }
+  }, [locCount]);
 
   return (
     <>
@@ -123,10 +161,7 @@ const Main = ({
         ? <View style={styles.preAppLoader}>
             <Loader />
           </View>
-        : <GestureRecognizer
-          onSwipeRight={decreaseIdx}
-          onSwipeLeft={increaseIdx}
-        >
+        : <>
           <ImageBackground
             source={
               showBackground 
@@ -136,44 +171,49 @@ const Main = ({
             style={styles.viewportContainer}
             imageStyle={{
               resizeMode: 'cover',
-              height: viewportHeight / (viewportHeight / appWidth + .5),
-              width: appWidth,
+              height: portraitHeight / (portraitHeight / currentWidth + .5),
+              width: currentWidth,
               top: undefined,
               bottom: 0
-            }}
-          >
-            {showForecast && (
-              <>
-                <Header unit={unit} toggleUnitPref={toggleUnitPref} />
-                <Forecast
-                  forecast={forecast}
-                  unit={unit}
-                  updateIdx={setIdx}
-                  idx={idx}
-                />
-              </>
-            )}
-            {showLoader &&  (
-              <View style={styles.loader}>
-                <Loader />
-              </View>
-            )}
-            <Search
-              setLocation={setLocation}
-              keyboard={keyboard}
-              setKeyboard={setKeyboard}
-            />
-            {showWearables && (
-              <TouchableOpacity
-                style={styles.linkContainer}
-                onPress={scrollToWearables}
-              >
-                <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>
-                  Today's wearables
-                </Text>
-                <Carat c={!showBackground ? 'white' : 'black'} w={12} />
-              </TouchableOpacity>
-            )}
+            }}>
+            <GestureRecognizer
+              onSwipeRight={decreaseIdx}
+              onSwipeLeft={increaseIdx}
+              style={styles.swipeContainer}
+            >
+              {showForecast && (
+                <>
+                  <Header unit={unit} toggleUnitPref={toggleUnitPref} />
+                  <Forecast
+                    forecast={forecast}
+                    unit={unit}
+                    updateIdx={setIdx}
+                    idx={idx}
+                  />
+                </>
+              )}
+              {showLoader &&  (
+                <View style={styles.loader}>
+                  <Loader />
+                </View>
+              )}
+              <Search
+                setLocation={setLocation}
+                keyboard={keyboard}
+                setKeyboard={setKeyboard}
+              />
+              {showWearables && (
+                <TouchableOpacity
+                  style={styles.linkContainer}
+                  onPress={scrollToWearables}
+                >
+                  <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>
+                    Today's wearables
+                  </Text>
+                  <Carat c={!showBackground ? 'white' : 'black'} w={12} />
+                </TouchableOpacity>
+              )}
+            </GestureRecognizer>
           </ImageBackground>
           {!keyboard && (
             <View>
@@ -182,16 +222,17 @@ const Main = ({
                 style={styles.wearablesView}
                 imageStyle={{
                   resizeMode: 'cover',
-                  height: viewportHeight / (viewportHeight / appWidth + .5),
-                  width: appWidth
-                }}
-              >
-              {showWearables && <Wearables wearables={wearables} />}
-            </ImageBackground>
-            <Footer />
-          </View>
-        )}
-        </GestureRecognizer>}
+                  height: portraitHeight / (portraitHeight / currentWidth + .5),
+                  width: currentWidth
+                }}>
+                {showWearables && <Wearables wearables={wearables} />}
+              </ImageBackground>
+              <Footer />
+              <BannerAd location='footer' />
+            </View>
+          )}
+          </>
+        }
     </>
   );
 };
@@ -208,6 +249,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     flexGrow: 6
+  },
+  swipeContainer: {
+    flexGrow: 1,
   },
   linkContainer: {
     display: 'flex',
@@ -232,6 +276,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  footerAd: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    paddingTop: 20, 
+  }
 });
 
 export default Main;

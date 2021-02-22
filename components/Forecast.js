@@ -17,7 +17,9 @@ import {
 } from 'react-native';
 import { Colors } from '../config/colors';
 
-const { height: viewportHeight, width: viewportWidth } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
+const viewportHeight = Math.max(height, width);
+const viewportWidth = Math.min(width, height);
 
 const Forecast = ({ forecast = [], unit = 'F', updateIdx, idx }) => {
   if (!forecast || !forecast[idx]) return null;

@@ -5,7 +5,6 @@
  * @format
  * @flow strict-local
  */
-
 import React, { useEffect, useState, useRef } from 'react';
 import {
   SafeAreaView,
@@ -13,9 +12,11 @@ import {
   ScrollView,
   StatusBar,
   Dimensions,
+  View,
 } from 'react-native';
 
 import Main from './Main';
+import BannerAd from './BannerAd';
 
 import { clearOldWeatherCache } from '../config/weather';
 import { Colors } from '../config/colors';
@@ -28,18 +29,25 @@ Sentry.init({
   enableNative: true,
 });
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
+const { width, height} = Dimensions.get('window');
+const portraitHeight = Math.max(width, height);
 
 const App = () => {
-  const [appWidth, setAppWidth] = useState(viewportWidth);
+  const [currentWidth, setCurrentWidth] = useState(width);
+  const [showAd, setShowAd] = useState(false);
   const wearablesRef = useRef();
 
   const onLayout = (e) => {
-    if (e?.nativeEvent?.layout?.width) setAppWidth(e.nativeEvent.layout.width);
+    if (e?.nativeEvent?.layout?.width) setCurrentWidth(e.nativeEvent.layout.width);
+  }
+
+  const onScroll = (e) => {
+    if (e?.nativeEvent?.contentOffset?.y > portraitHeight / 4) setShowAd(true);
+    else (setShowAd(false));
   }
 
   const scrollToWearables = () => { 
-    wearablesRef.current.scrollTo({ y: viewportHeight + 10, animated: true });
+    wearablesRef.current.scrollTo({ y: portraitHeight + 10, animated: true });
   };
 
   useEffect(() => {
@@ -56,10 +64,16 @@ const App = () => {
           contentContainerStyle={styles.scrollView}
           showsVerticalScrollIndicator={false}
           ref={wearablesRef}
-          onLayout={onLayout}>
+          onLayout={onLayout}
+          onScroll={onScroll}
+          stickyHeaderIndices={[0]}>
+          <View>
+            <BannerAd location='header' size='banner' hideAd={!showAd} />
+          </View>
           <Main
             scrollToWearables={scrollToWearables}
-            appWidth={appWidth} />
+            currentWidth={currentWidth}
+            portraitHeight={portraitHeight} />
         </ScrollView>
       </SafeAreaView>
     </>
