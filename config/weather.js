@@ -5,7 +5,7 @@ import { getWearables } from './wearables';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 
-const useMock = true;
+const useMock = false;
 const useCache = true;
 
 const ANGLED_RAIN = require('../assets/weather/ANGLED_RAIN.png');
