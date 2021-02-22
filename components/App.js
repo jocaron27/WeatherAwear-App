@@ -67,7 +67,7 @@ const App = () => {
           onLayout={onLayout}
           onScroll={onScroll}
           stickyHeaderIndices={[0]}>
-          <View>
+          <View style={styles.ad} >
             <BannerAd location='header' size='banner' hideAd={!showAd} />
           </View>
           <Main
@@ -81,6 +81,12 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  ad: {
+    position: 'absolute',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center'
+  },
   scrollView: {
     backgroundColor: Colors.navy,
     display: 'flex',
