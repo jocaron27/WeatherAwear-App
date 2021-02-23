@@ -22,7 +22,7 @@ const Header = ({ unit, toggleUnitPref }) => {
       <Logo />
       <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
         <Text style={styles.toggleText}>
-          {`switch to ${unit === 'F' ? 'Celcius' : 'Fahrenheit'}`}
+          {`switch to ${unit === 'F' ? 'Celsius' : 'Fahrenheit'}`}
         </Text>
       </TouchableOpacity>
     </View>
