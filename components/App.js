@@ -52,7 +52,7 @@ const App = () => {
 
   useEffect(() => {
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
-    clearOldWeatherCache();
+    clearOldWeatherCache(true);
   }, []);
 
   return (

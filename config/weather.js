@@ -140,12 +140,13 @@ const formatWeatherResponse = ({ data }) => {
     });
 };
 
-export const clearOldWeatherCache = async () => {
+export const clearOldWeatherCache = async (all = false) => {
     const currentDate = new Date(Date.now()).toDateString();
     const keys = await getAllCacheKeys();
     const forecastKeys = keys.filter(key => key.includes(`forecast-`));
     forecastKeys.forEach(key => {
-        if (!key.startsWith(`forecast-${currentDate}`)) clearCacheValue(key);
+        if (all) clearCacheValue(key);
+        else if (!key.startsWith(`forecast-${currentDate}`)) clearCacheValue(key);
     });
 }
 

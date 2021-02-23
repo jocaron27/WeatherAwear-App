@@ -165,7 +165,6 @@ const Main = ({
     setInitialLocation();
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
-    clearOldWeatherCache();
     AdMobInterstitial.setAdUnitID('ca-app-pub-9279593135031162/7046496130');
   }, []);
 
