@@ -114,7 +114,6 @@ const Main = ({
   const getLastLocation = async () => {
     try {
       const lastLocation = await getCacheData('lastSearchedLocation');
-      console.log(lastLocation);
       if (lastLocation && typeof lastLocation === 'string') setLocation(lastLocation);
       else setLocation(defaultLocation);
     } catch (e) {
@@ -137,17 +136,16 @@ const Main = ({
             buttonPositive: "OK"
           }
         );
-        console.log('perm', granted);
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           Geolocation.getCurrentPosition(info => {
-            if (info?.coords) {
+            if (info.coords) {
               const { latitude, longitude } = info.coords;
-              setLocation(`${latitude},${longitude}`);
-              return;
+              if (latitude && longitude) {
+                setLocation(`${latitude},${longitude}`);
+                return;
+              }
             }
           });
-
-          return;
         }
         // Fallback
         getLastLocation();
@@ -157,7 +155,6 @@ const Main = ({
         getLastLocation();
       }
     } catch (e) {
-      console.log(e);
       getLastLocation();
     }
   }
