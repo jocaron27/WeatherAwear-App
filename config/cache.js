@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const storeCacheData = async (key, value) => {
-    console.log('storing...');
     try {
       const jsonValue = JSON.stringify(value)
       await AsyncStorage.setItem(key, jsonValue)
@@ -11,7 +10,6 @@ export const storeCacheData = async (key, value) => {
 }
 
 export const getCacheData = async (key) => {
-    console.log('Getting data from cache... ', key);
     try {
       const jsonValue = await AsyncStorage.getItem(key)
       return jsonValue != null ? JSON.parse(jsonValue) : null;

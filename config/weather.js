@@ -176,9 +176,7 @@ export const getWeather = async ({ location = '' } ) => {
     }
     else return await axios.get(`https://us-central1-weatherwear-185516.cloudfunctions.net/forecast?location=${location}`)
         .then(response => {
-            console.log('res', response);
             if (response.error) {
-                console.log(response.error);
                 Toast.show('Unable to get weather data');
                 return null;
             }
@@ -186,7 +184,6 @@ export const getWeather = async ({ location = '' } ) => {
             return formatWeatherResponse(response);
         })
         .catch(error => {
-            console.log(error);
             Toast.show('Unable to get weather data');
         });
 }

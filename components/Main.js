@@ -150,8 +150,9 @@ const Main = ({
         // Fallback
         getLastLocation();
       } else {
-        Geolocation.requestAuthorization();
-        Geolocation.getCurrentPosition(info => console.log('ios', info));
+        // TODO: Set up geolocation for iOS
+        // Geolocation.requestAuthorization();
+        // Geolocation.getCurrentPosition(info => console.log('ios', info));
         getLastLocation();
       }
     } catch (e) {
@@ -166,7 +167,6 @@ const Main = ({
     getUnitPref();
     clearOldWeatherCache();
     AdMobInterstitial.setAdUnitID('ca-app-pub-9279593135031162/7046496130');
-    AdMobInterstitial.setTestDevices(['07307a5d-b6b3-4c93-85ad-d905168c26fa']);
   }, []);
 
   useEffect(() => {
@@ -183,7 +183,6 @@ const Main = ({
           setAppLoaded(true);
           setlocCount(locCount + 1)
           if (weather) {
-            console.log(weather);
             if (!weather[idx]) setIdx(0);
             setForecast(weather);
             setWearables(weather[idx].wearables);

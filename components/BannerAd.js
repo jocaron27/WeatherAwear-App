@@ -37,10 +37,7 @@ const BannerAd = ({
     <View style={styles.ad} >
       <AdMobBanner
         adSize={size || 'smartBannerPortrait'}
-        adUnitID={adUnitID} // Actual
-        testDevices={['07307a5d-b6b3-4c93-85ad-d905168c26fa']} // Actual
-        // adUnitID="ca-app-pub-3940256099942544/6300978111" // Test
-        // testDevices={[AdMobBanner.simulatorId]} // Test
+        adUnitID={adUnitID}
         ref={adRef}/>
     </View>
   );
