@@ -14,12 +14,15 @@ import {
   Text,
   ImageBackground,
   Dimensions,
+  PermissionsAndroid,
+  Platform
 } from 'react-native';
 
 import { AdMobInterstitial } from 'react-native-admob';
 
 import SplashScreen from 'react-native-splash-screen';
 import GestureRecognizer from 'react-native-swipe-gestures';
+import Geolocation from '@react-native-community/geolocation';
 
 import { getWeather, clearOldWeatherCache } from '../config/weather';
 import { storeCacheData, getCacheData } from '../config/cache';
@@ -44,8 +47,8 @@ const Main = ({
   scrollToWearables,
 }) => {
   // LOCATION
-  const initialLocation = 'New York City'; // TODO: get user location
-  const [location, setLocation] = useState(initialLocation);
+  const defaultLocation = 'New York City';
+  const [location, setLocation] = useState('');
   // PREFS
   const [unit, setUnit] = useState(null);
   // UI STATE
@@ -64,8 +67,8 @@ const Main = ({
   const showWearables = loadedNoKeyboard && wearables && !!wearables.length;
   // ADS
   const adRef = useRef();
-  const locChangeAdFrequency = 2;
-  const [locCount, setlocCount] = useState(1);
+  const locChangeAdFrequency = 3;
+  const [locCount, setlocCount] = useState(0);
   const popupAdLimit = 1;
   const [popupAdCount, setPopupAdCount] = useState(0);
   const showPopupAd = () => {
@@ -107,8 +110,61 @@ const Main = ({
     if (idx < forecast.length - 1) setIdx(idx + 1);
   }
 
+  // Determining the initial location
+  const getLastLocation = async () => {
+    try {
+      const lastLocation = await getCacheData('lastSearchedLocation');
+      console.log(lastLocation);
+      if (lastLocation && typeof lastLocation === 'string') setLocation(lastLocation);
+      else setLocation(defaultLocation);
+    } catch (e) {
+      setLocation(defaultLocation);
+    }
+  }
+
+  const setInitialLocation = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Weatherawear Location Permission",
+            message:
+              "Weatherawear is requesting access to your location " +
+              "so you can receive a personalized forecast.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "No thanks",
+            buttonPositive: "OK"
+          }
+        );
+        console.log('perm', granted);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          Geolocation.getCurrentPosition(info => {
+            if (info?.coords) {
+              const { latitude, longitude } = info.coords;
+              setLocation(`${latitude},${longitude}`);
+              return;
+            }
+          });
+
+          return;
+        }
+        // Fallback
+        getLastLocation();
+      } else {
+        Geolocation.requestAuthorization();
+        Geolocation.getCurrentPosition(info => console.log('ios', info));
+        getLastLocation();
+      }
+    } catch (e) {
+      console.log(e);
+      getLastLocation();
+    }
+  }
+
   // Initialize
   useEffect(() => {
+    setInitialLocation();
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
     clearOldWeatherCache();
@@ -123,17 +179,18 @@ const Main = ({
   // Fetch
   useEffect(() => {
     setLoading(true);
-    getWeather({ location })
+    if (location) getWeather({ location })
       .then(weather => {
         setTimeout(() => {
           setLoading(false);
           setAppLoaded(true);
-          if (location !== initialLocation) setlocCount(locCount + 1)
+          setlocCount(locCount + 1)
           if (weather) {
             console.log(weather);
             if (!weather[idx]) setIdx(0);
             setForecast(weather);
             setWearables(weather[idx].wearables);
+            storeCacheData('lastSearchedLocation', location);
           }
         }, 500)
       });
