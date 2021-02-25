@@ -19,10 +19,10 @@ import {
 } from 'react-native';
 
 import { AdMobInterstitial } from 'react-native-admob';
-
 import SplashScreen from 'react-native-splash-screen';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Geolocation from '@react-native-community/geolocation';
+import * as Sentry from '@sentry/react-native';
 
 import { getWeather, clearOldWeatherCache } from '../config/weather';
 import { storeCacheData, getCacheData } from '../config/cache';
@@ -59,6 +59,7 @@ const Main = ({
   // DATA
   const [forecast, setForecast] = useState([]);
   const [wearables, setWearables] = useState([]);
+  const [timeOfDay, setTimeOfDay] = useState('day');
   // SHOW/HIDE LOGIC
   const showBackground = !keyboard && portraitHeight > 600;
   const showLoader = loading && !keyboard;
@@ -78,7 +79,9 @@ const Main = ({
           AdMobInterstitial?.showAd();
           setPopupAdCount(popupAdCount + 1);
         })
-        .catch(() => {})
+        .catch((error) => {
+          Sentry.captureException(error);
+        })
   };
 
   // Unit Pref methods
@@ -110,14 +113,43 @@ const Main = ({
     if (idx < forecast.length - 1) setIdx(idx + 1);
   }
 
+  const resetWearables = () => {
+    try {
+      const wearables = forecast?.[idx]?.[timeOfDay === 'day' ? 'wearablesDay' : 'wearablesNight']
+      if (wearables) setWearables(wearables);
+    } catch (error) {
+      clearOldWeatherCache(true);
+      resetForecast();
+      Sentry.captureException(error);
+    }
+  }
+
+  const resetForecast = () => {
+    if (location) getWeather({ location })
+      .then(weather => {
+        setTimeout(() => {
+          setLoading(false);
+          setAppLoaded(true);
+          setlocCount(locCount + 1)
+          if (weather) {
+            if (!weather[idx]) setIdx(0);
+            setForecast(weather);
+            setWearables(weather[idx][timeOfDay === 'day' ? 'wearablesDay' : 'wearablesNight']);
+            storeCacheData('lastSearchedLocation', location);
+          }
+        }, 500)
+      });
+  }
+
   // Determining the initial location
   const getLastLocation = async () => {
     try {
       const lastLocation = await getCacheData('lastSearchedLocation');
       if (lastLocation && typeof lastLocation === 'string') setLocation(lastLocation);
       else setLocation(defaultLocation);
-    } catch (e) {
+    } catch (error) {
       setLocation(defaultLocation);
+      Sentry.captureException(error);
     }
   }
 
@@ -155,16 +187,17 @@ const Main = ({
         // Geolocation.getCurrentPosition(info => console.log('ios', info));
         getLastLocation();
       }
-    } catch (e) {
+    } catch (error) {
       getLastLocation();
+      Sentry.captureException(error);
     }
   }
 
   // Initialize
   useEffect(() => {
     setInitialLocation();
-    if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     getUnitPref();
+    if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     AdMobInterstitial.setAdUnitID('ca-app-pub-9279593135031162/7046496130');
   }, []);
 
@@ -175,25 +208,16 @@ const Main = ({
   // Fetch
   useEffect(() => {
     setLoading(true);
-    if (location) getWeather({ location })
-      .then(weather => {
-        setTimeout(() => {
-          setLoading(false);
-          setAppLoaded(true);
-          setlocCount(locCount + 1)
-          if (weather) {
-            if (!weather[idx]) setIdx(0);
-            setForecast(weather);
-            setWearables(weather[idx].wearables);
-            storeCacheData('lastSearchedLocation', location);
-          }
-        }, 500)
-      });
+    resetForecast();
   }, [location]);
+
+  useEffect(() => {
+    resetWearables();
+  }, [timeOfDay]);
 
   // Display wearables
   useEffect(() => {
-    if (forecast[idx] && forecast[idx].wearables) setWearables(forecast[idx].wearables);
+    resetWearables();
     // Show ad on last day of forecast
     if (idx === forecast.length - 1) {
       showPopupAd();
@@ -260,7 +284,7 @@ const Main = ({
                   onPress={scrollToWearables}
                 >
                   <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>
-                    Today's wearables
+                    {`To${timeOfDay}'s wearables`}
                   </Text>
                   <Carat c={!showBackground ? 'white' : 'black'} w={12} />
                 </TouchableOpacity>
@@ -277,7 +301,13 @@ const Main = ({
                   height: portraitHeight / (portraitHeight / currentWidth + .5),
                   width: currentWidth
                 }}>
-                {showWearables && <Wearables wearables={wearables} />}
+                {showWearables &&
+                  <Wearables
+                    wearables={wearables}
+                    timeOfDay={timeOfDay}
+                    setTimeOfDay={setTimeOfDay}
+                  />
+                }
               </ImageBackground>
               <Footer />
               <BannerAd location='footer' />
@@ -307,8 +337,9 @@ const styles = StyleSheet.create({
   },
   linkContainer: {
     display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    justifyContent: 'center',
     flexGrow: 1
   },
   wearablesLink: {

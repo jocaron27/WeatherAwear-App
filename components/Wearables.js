@@ -12,11 +12,20 @@ import {
   Text,
   Image,
 } from 'react-native';
+import TimeOfDay from './TimeOfDay';
 import { Colors } from '../config/colors';
 
-const Wearables = ({ wearables = [] }) => {
+const Wearables = ({
+  wearables = [],
+  timeOfDay,
+  setTimeOfDay,
+}) => {
   return (
     <>
+      <TimeOfDay 
+        timeOfDay={timeOfDay}
+        setTimeOfDay={setTimeOfDay}
+      />
       {wearables.map(wearable => (
         <View key={wearable.name} style={styles.wearable}>
           <Image source={wearable.icon} style={styles.icon} />

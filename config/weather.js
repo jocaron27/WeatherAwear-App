@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import axios from 'axios';
 import * as mockData from './mockData.json';
 import { storeCacheData, getCacheData, getAllCacheKeys, clearCacheValue } from './cache';
@@ -106,7 +107,7 @@ const getPrecipType = (weatherCode) => {
 /** Extract relevant data for daily weather forecast
  * See additional available properties at https://www.weatherapi.com/docs
  */
-const formatWeatherResponse = ({ data }) => {
+export const formatWeatherResponse = ({ data }) => {
     const { forecast, location } = data;
     const { name, region, country } = location;
 
@@ -117,7 +118,6 @@ const formatWeatherResponse = ({ data }) => {
         const precip = type === 'SNOW' ? Number(day.daily_chance_of_snow) : Number(day.daily_chance_of_rain);
         const precipType = type === 'SNOW' ? 'snow' : 'rain';
         const summary = day?.condition?.text?.toLowerCase();
-        const avg = day.avgtemp_f;
         return {
             name,
             region,
@@ -129,9 +129,15 @@ const formatWeatherResponse = ({ data }) => {
             precipType,
             hi: day.maxtemp_f,
             lo: day.mintemp_f,
-            avg,
-            wearables: getWearables({
-                avg,
+            avg: day.avgtemp_f,
+            wearablesDay: getWearables({
+                temp: day.maxtemp_f,
+                precip,
+                precipType,
+                summary,
+            }),
+            wearablesNight: getWearables({
+                temp: day.mintemp_f,
                 precip,
                 precipType,
                 summary,
@@ -165,7 +171,7 @@ export const getWeather = async ({ location = '' } ) => {
             } catch(error) {
                 // Cache data is bad, so clear
                 clearCacheValue(cacheKey);
-                console.error(error);
+                Sentry.captureException(error);
             }
         }
     }
@@ -178,6 +184,7 @@ export const getWeather = async ({ location = '' } ) => {
     else return await axios.get(`https://us-central1-weatherwear-185516.cloudfunctions.net/forecast?location=${location}`)
         .then(response => {
             if (response.error) {
+                Sentry.captureException(response.error);
                 Toast.show('Unable to get weather data');
                 return null;
             }
@@ -185,6 +192,7 @@ export const getWeather = async ({ location = '' } ) => {
             return formatWeatherResponse(response);
         })
         .catch(error => {
+            Sentry.captureException(error);
             Toast.show('Unable to get weather data');
         });
 }

@@ -47,7 +47,7 @@ const App = () => {
   }
 
   const scrollToWearables = () => { 
-    wearablesRef.current.scrollTo({ y: portraitHeight + 10, animated: true });
+    wearablesRef.current.scrollTo({ y: portraitHeight - 60, animated: true });
   };
 
   useEffect(() => {
