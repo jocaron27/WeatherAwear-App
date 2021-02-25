@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        flexGrow: 1,
+        flexGrow: 2,
         minHeight: 30,
       },
       arrow: {
