@@ -125,7 +125,9 @@ const Main = ({
   }
 
   const resetForecast = () => {
-    if (location) getWeather({ location })
+    if (location) {
+      setLoading(true);
+      getWeather({ location })
       .then(weather => {
         setTimeout(() => {
           setLoading(false);
@@ -139,10 +141,12 @@ const Main = ({
           }
         }, 500)
       });
+    }
   }
 
   // Determining the initial location
   const getLastLocation = async () => {
+    if (location) return; // Don't re-initialize
     try {
       const lastLocation = await getCacheData('lastSearchedLocation');
       if (lastLocation && typeof lastLocation === 'string') setLocation(lastLocation);
@@ -169,10 +173,10 @@ const Main = ({
           }
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          Geolocation.getCurrentPosition(info => {
+          await Geolocation.getCurrentPosition(info => {
             if (info.coords) {
               const { latitude, longitude } = info.coords;
-              if (latitude && longitude) {
+              if (!location && latitude && longitude) { // don't reinitialize
                 setLocation(`${latitude},${longitude}`);
                 return;
               }
@@ -180,7 +184,7 @@ const Main = ({
           });
         }
         // Fallback
-        getLastLocation();
+        else getLastLocation();
       } else {
         // TODO: Set up geolocation for iOS
         // Geolocation.requestAuthorization();
@@ -207,7 +211,6 @@ const Main = ({
 
   // Fetch
   useEffect(() => {
-    setLoading(true);
     resetForecast();
   }, [location]);
 
