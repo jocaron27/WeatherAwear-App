@@ -15,21 +15,21 @@ import {
 import { Colors } from '../config/colors';
 
 export const TimeOfDay = ({
-  timeOfDay = 'day',
+  timeOfDay = 'Day',
   setTimeOfDay,
 }) => {
   
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        onPress={() => setTimeOfDay('day')}
-        style={[styles.button, styles.day, timeOfDay === 'day' ? styles.selected : null]}
+        onPress={() => setTimeOfDay('Day')}
+        style={[styles.button, styles.day, timeOfDay === 'Day' ? styles.selected : null]}
       >
         <Text style={[styles.text, styles.dayText]}>day</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-        onPress={() => setTimeOfDay('night')}
-        style={[styles.button, styles.night, timeOfDay === 'night' ? styles.selected : null]}
+        onPress={() => setTimeOfDay('Night')}
+        style={[styles.button, styles.night, timeOfDay === 'Night' ? styles.selected : null]}
       >
         <Text style={[styles.text, styles.nightText]}>night</Text>
       </TouchableOpacity>

@@ -34,6 +34,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Loader from './Loader';
 import Search from './Search';
+import Settings from './Settings';
 import Wearables from './Wearables';
 import BannerAd from './BannerAd';
 
@@ -51,15 +52,17 @@ const Main = ({
   const [location, setLocation] = useState('');
   // PREFS
   const [unit, setUnit] = useState(null);
+  const [tempConfig, setTempConfig] = useState('');
   // UI STATE
   const [appLoaded, setAppLoaded] = useState(false);
   const [keyboard, setKeyboard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [idx, setIdx] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
   // DATA
   const [forecast, setForecast] = useState([]);
   const [wearables, setWearables] = useState([]);
-  const [timeOfDay, setTimeOfDay] = useState('day');
+  const [timeOfDay, setTimeOfDay] = useState('Day');
   // SHOW/HIDE LOGIC
   const showBackground = !keyboard && portraitHeight > 600;
   const showLoader = loading && !keyboard;
@@ -84,6 +87,8 @@ const Main = ({
         })
   };
 
+  const toggleSettings = () => setShowSettings(!showSettings);
+
   // Unit Pref methods
   const getUnitPref = async () => {
     const pref = await getCacheData('unitPref');
@@ -104,6 +109,26 @@ const Main = ({
     setUnitPref(newPref);
   }
 
+  // Temp config
+  const getTempConfig = async () => {
+    try {
+      const pref = await getCacheData('tempConfig');
+      if (pref === '' || pref === 'Hot' || pref === 'Cold') {
+        setTempConfig(pref);
+      } else {
+        setTempConfig('');
+      }
+    } catch (error) {
+      setTempConfig('')
+      Sentry.captureException(error);
+    }
+  }
+
+  const setTempConfigPref = (pref) => {
+    setTempConfig(pref);
+    storeCacheData('tempConfig', pref);
+  }
+
   // Forecast Index methods
   const decreaseIdx = () => {
     if (idx > 0) setIdx(idx - 1);
@@ -114,8 +139,9 @@ const Main = ({
   }
 
   const resetWearables = () => {
+    const wearablesKey = `wearables${timeOfDay}${tempConfig}`;
     try {
-      const wearables = forecast?.[idx]?.[timeOfDay === 'day' ? 'wearablesDay' : 'wearablesNight']
+      const wearables = forecast?.[idx]?.[wearablesKey];
       if (wearables) setWearables(wearables);
     } catch (error) {
       clearOldWeatherCache(true);
@@ -136,7 +162,6 @@ const Main = ({
           if (weather) {
             if (!weather[idx]) setIdx(0);
             setForecast(weather);
-            setWearables(weather[idx][timeOfDay === 'day' ? 'wearablesDay' : 'wearablesNight']);
             storeCacheData('lastSearchedLocation', location);
           }
         }, 500)
@@ -158,30 +183,33 @@ const Main = ({
   }
 
   const setInitialLocation = async () => {
+    await getTempConfig();
     try {
       if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: "Weatherawear Location Permission",
+            title: "Share your location?",
             message:
-              "Weatherawear is requesting access to your location " +
-              "so you can receive a personalized forecast.",
+              "Weather Awear is requesting access to your location so you can receive a relevant weather forecast.",
             buttonNeutral: "Ask Me Later",
             buttonNegative: "No thanks",
             buttonPositive: "OK"
           }
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          await Geolocation.getCurrentPosition(info => {
+          const onGPSSuccess = (info) => {
             if (info.coords) {
               const { latitude, longitude } = info.coords;
               if (!location && latitude && longitude) { // don't reinitialize
                 setLocation(`${latitude},${longitude}`);
-                return;
               }
             }
-          });
+          };
+          const onGPSFail = () => {
+            getLastLocation();
+          }
+          await Geolocation.getCurrentPosition(onGPSSuccess, onGPSFail);
         }
         // Fallback
         else getLastLocation();
@@ -216,7 +244,7 @@ const Main = ({
 
   useEffect(() => {
     resetWearables();
-  }, [timeOfDay]);
+  }, [forecast, timeOfDay, tempConfig]);
 
   // Display wearables
   useEffect(() => {
@@ -240,84 +268,94 @@ const Main = ({
         ? <View style={styles.preAppLoader}>
             <Loader />
           </View>
-        : <>
-          <ImageBackground
-            source={
-              showBackground 
-                ? require('../assets/shapes/peachSwoosh.png')
-                : null
-            }
-            style={styles.viewportContainer}
-            imageStyle={{
-              resizeMode: 'cover',
-              height: portraitHeight / (portraitHeight / currentWidth + .5),
-              width: currentWidth,
-              top: undefined,
-              bottom: 0
-            }}>
-            <GestureRecognizer
-              onSwipeRight={decreaseIdx}
-              onSwipeLeft={increaseIdx}
-              style={styles.swipeContainer}
-            >
-              {showForecast && (
-                <>
-                  <Header unit={unit} toggleUnitPref={toggleUnitPref} />
-                  <Forecast
-                    forecast={forecast}
-                    unit={unit}
-                    updateIdx={setIdx}
-                    idx={idx}
-                  />
-                </>
-              )}
-              {showLoader &&  (
-                <View style={styles.loader}>
-                  <Loader />
-                </View>
-              )}
-              <Search
-                setLocation={setLocation}
-                keyboard={keyboard}
-                setKeyboard={setKeyboard}
+      : showSettings
+        ? <>
+            <Header toggleSettings={toggleSettings} />
+            <Settings
+                toggleUnitPref={toggleUnitPref}
+                unit={unit}
+                setTempConfigPref={setTempConfigPref}
+                tempConfig={tempConfig}
               />
-              {showWearables && (
-                <TouchableOpacity
-                  style={styles.linkContainer}
-                  onPress={scrollToWearables}
-                >
-                  <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>
-                    {`To${timeOfDay}'s wearables`}
-                  </Text>
-                  <Carat c={!showBackground ? 'white' : 'black'} w={12} />
-                </TouchableOpacity>
-              )}
-            </GestureRecognizer>
-          </ImageBackground>
-          {!keyboard && (
-            <View>
-              <ImageBackground
-                source={showBackground ? require('../assets/shapes/peachSwooshFlipped.png') : null}
-                style={styles.wearablesView}
-                imageStyle={{
-                  resizeMode: 'cover',
-                  height: portraitHeight / (portraitHeight / currentWidth + .5),
-                  width: currentWidth
-                }}>
-                {showWearables &&
-                  <Wearables
-                    wearables={wearables}
-                    timeOfDay={timeOfDay}
-                    setTimeOfDay={setTimeOfDay}
-                  />
-                }
-              </ImageBackground>
-              <Footer />
-              <BannerAd location='footer' />
-            </View>
-          )}
           </>
-        }
+      : <>
+        <ImageBackground
+          source={
+            showBackground 
+              ? require('../assets/shapes/peachSwoosh.png')
+              : null
+          }
+          style={styles.viewportContainer}
+          imageStyle={{
+            resizeMode: 'cover',
+            height: portraitHeight / (portraitHeight / currentWidth + .5),
+            width: currentWidth,
+            top: undefined,
+            bottom: 0
+          }}>
+          <GestureRecognizer
+            onSwipeRight={decreaseIdx}
+            onSwipeLeft={increaseIdx}
+            style={styles.swipeContainer}
+          >
+            {showForecast && (
+              <>
+                <Header toggleSettings={toggleSettings} />
+                <Forecast
+                  forecast={forecast}
+                  unit={unit}
+                  updateIdx={setIdx}
+                  idx={idx}
+                />
+              </>
+            )}
+            {showLoader &&  (
+              <View style={styles.loader}>
+                <Loader />
+              </View>
+            )}
+            <Search
+              setLocation={setLocation}
+              keyboard={keyboard}
+              setKeyboard={setKeyboard}
+            />
+            {showWearables && (
+              <TouchableOpacity
+                style={styles.linkContainer}
+                onPress={scrollToWearables}
+              >
+                <Text style={[styles.wearablesLink, !showBackground ? styles.contrast : null]}>
+                  {`To${timeOfDay.toLowerCase()}'s wearables`}
+                </Text>
+                <Carat c={!showBackground ? 'white' : 'black'} w={12} />
+              </TouchableOpacity>
+            )}
+          </GestureRecognizer>
+        </ImageBackground>
+        {!keyboard && (
+          <View>
+            <ImageBackground
+              source={showBackground ? require('../assets/shapes/peachSwooshFlipped.png') : null}
+              style={styles.wearablesView}
+              imageStyle={{
+                resizeMode: 'cover',
+                height: portraitHeight / (portraitHeight / currentWidth + .5),
+                width: currentWidth
+              }}>
+              {showWearables &&
+                <Wearables
+                  wearables={wearables}
+                  timeOfDay={timeOfDay}
+                  setTimeOfDay={setTimeOfDay}
+                />
+              }
+            </ImageBackground>
+            <Footer />
+            <BannerAd location='footer' />
+          </View>
+        )}
+        </>
+      }
     </>
   );
 };

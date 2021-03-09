@@ -112,12 +112,22 @@ export const formatWeatherResponse = ({ data }) => {
     const { name, region, country } = location;
 
     return forecast.forecastday.map(({ day, date }) => {
-        const formattedDate = moment(date).format('LL').slice(0, -6);
+        const formattedDate = moment(date).format('LLLL').slice(0, -15);
         const code = day?.condition?.code || 1000;
         const type = getPrecipType(code);
         const precip = type === 'SNOW' ? Number(day.daily_chance_of_snow) : Number(day.daily_chance_of_rain);
         const precipType = type === 'SNOW' ? 'snow' : 'rain';
         const summary = day?.condition?.text?.toLowerCase();
+
+        const getWearablesConfig = (timeOfDay, tempConfig) => {
+            return getWearables({
+                temp: timeOfDay,
+                precip,
+                precipType,
+                summary,
+            }, tempConfig);
+        };
+
         return {
             name,
             region,
@@ -130,18 +140,12 @@ export const formatWeatherResponse = ({ data }) => {
             hi: day.maxtemp_f,
             lo: day.mintemp_f,
             avg: day.avgtemp_f,
-            wearablesDay: getWearables({
-                temp: day.maxtemp_f,
-                precip,
-                precipType,
-                summary,
-            }),
-            wearablesNight: getWearables({
-                temp: day.mintemp_f,
-                precip,
-                precipType,
-                summary,
-            })
+            wearablesDay: getWearablesConfig(day.maxtemp_f, 'AVG'),
+            wearablesNight: getWearablesConfig(day.mintemp_f, 'AVG'),
+            wearablesDayHot: getWearablesConfig(day.maxtemp_f, 'HOT'),
+            wearablesNightHot: getWearablesConfig(day.mintemp_f, 'HOT'),
+            wearablesDayCold: getWearablesConfig(day.maxtemp_f, 'COLD'),
+            wearablesNightCold: getWearablesConfig(day.mintemp_f, 'COLD'),
         };
     });
 };
@@ -179,7 +183,7 @@ export const getWeather = async ({ location = '' } ) => {
     // Return data
     if (useMock) {
         storeCacheData(cacheKey, mockData);
-        return formatWeatherResponse(mockData);
+        return formatWeatherResponse(mockData, 'AVG');
     }
     else return await axios.get(`https://us-central1-weatherwear-185516.cloudfunctions.net/forecast?location=${location}`)
         .then(response => {

@@ -102,12 +102,15 @@ const styles = StyleSheet.create({
       flexGrow: 2
     },
       date: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         color: Colors.white,
         fontFamily: 'Poppins-Regular',
-        fontSize: 24,
+        fontSize: 20,
         textAlign: 'center',
         flexGrow: 10,
-        lineHeight: 33
+        lineHeight: 28
       },
       disabledLeft: {
         borderRightColor: 'transparent',
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexGrow: 2,
-        minHeight: 30,
+        height: 33,
       },
       arrow: {
         width: 0, 

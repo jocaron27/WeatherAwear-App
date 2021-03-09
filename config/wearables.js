@@ -83,29 +83,73 @@ const PRECIP = {
 }
 
 const TEMP = {
-    frigid: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf, clothes.gloves], // 20-34
-    freezing: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf], // 35-42
-    cold: [clothes.sweater, clothes.mediumjacket, clothes.longpants, clothes.scarf], // 43-49
-    chilly: [clothes.sweater, clothes.mediumjacket, clothes.longpants], // 50-59
-    mild: [clothes.tshirt, clothes.lightjacket, clothes.longpants],  // 60-69
-    comfortable: [clothes.tshirt, clothes.longpants, clothes.shorts], // 70-72
-    warm: [clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals], // 73-79
-    hot: [clothes.sleevelessshirt, clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals] // 80+
+    AVG: {
+        frigid: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf, clothes.gloves], // 20-34
+        freezing: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf], // 35-42
+        cold: [clothes.sweater, clothes.mediumjacket, clothes.longpants, clothes.scarf], // 43-49
+        chilly: [clothes.sweater, clothes.mediumjacket, clothes.longpants], // 50-59
+        mild: [clothes.tshirt, clothes.lightjacket, clothes.longpants],  // 60-69
+        comfortable: [clothes.tshirt, clothes.longpants, clothes.shorts], // 70-74
+        warm: [clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals], // 75-79
+        hot: [clothes.sleevelessshirt, clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals] // 80+
+    },
+    COLD: {
+        frigid: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf, clothes.gloves], // 20-34
+        freezing: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf, clothes.gloves], // 35-42
+        cold: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf], // 43-49
+        chilly: [clothes.sweater, clothes.mediumjacket, clothes.longpants], // 50-59
+        mild: [clothes.tshirt, clothes.lightjacket, clothes.longpants],  // 60-69
+        comfortable: [clothes.tshirt, clothes.lightjacket, clothes.longpants], // 70-74
+        warm: [clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals], // 75-79
+        hot: [clothes.sleevelessshirt, clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals] // 80+
+    },
+    HOT: {
+        frigid: [clothes.sweater, clothes.thickjacket, clothes.longpants, clothes.hat, clothes.scarf, clothes.gloves], // 20-34
+        freezing: [clothes.sweater, clothes.mediumjacket, clothes.longpants, clothes.hat, clothes.scarf], // 35-42
+        cold: [clothes.sweater, clothes.mediumjacket, clothes.longpants], // 43-49
+        chilly: [clothes.sweater, clothes.lightjacket, clothes.longpants], // 50-59
+        mild: [clothes.tshirt, clothes.lightjacket, clothes.shorts, clothes.longpants],  // 60-69
+        comfortable: [clothes.tshirt, clothes.shorts, clothes.sandals], // 70-74
+        warm: [clothes.sleevelessshirt, clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals], // 75-79
+        hot: [clothes.sleevelessshirt, clothes.tshirt, clothes.shorts, clothes.skirt, clothes.dress, clothes.sandals] // 80+
+    } 
 }
-  
-export const getWearables = (day) => {
+
+export const ALL_WEARABLES = [
+    clothes.thickjacket,
+    clothes.mediumjacket,
+    clothes.lightjacket,
+    clothes.raincoat, 
+    clothes.sweater,
+    clothes.tshirt,
+    clothes.sleevelessshirt,
+    clothes.longpants,
+    clothes.shorts,
+    clothes.skirt,
+    clothes.dress,
+    clothes.snowboots,
+    clothes.rainboots,
+    clothes.sandals,
+    clothes.hat,
+    clothes.scarf,
+    clothes.gloves,
+    clothes.umbrella,
+    clothes.sunglasses,
+];
+
+export const getWearables = (day, config = 'AVG') => {
     if (!day) return [];
     const { temp, precip, precipType, summary } = day;
     let wearables = [];
 
-    if (temp < 35) wearables = wearables.concat(TEMP.frigid);
-    else if (temp < 43) wearables = wearables.concat(TEMP.freezing)
-    else if (temp < 50) wearables = wearables.concat(TEMP.cold)
-    else if (temp < 60) wearables = wearables.concat(TEMP.chilly)
-    else if (temp < 70) wearables = wearables.concat(TEMP.mild)
-    else if (temp < 73) wearables = wearables.concat(TEMP.comfortable)
-    else if (temp < 80) wearables = wearables.concat(TEMP.warm)
-    else if (temp >= 80) wearables = wearables.concat(TEMP.hot)
+    if (temp < 35) wearables = wearables.concat(TEMP[config].frigid);
+    else if (temp < 43) wearables = wearables.concat(TEMP[config].freezing)
+    else if (temp < 50) wearables = wearables.concat(TEMP[config].cold)
+    else if (temp < 60) wearables = wearables.concat(TEMP[config].chilly)
+    else if (temp < 70) wearables = wearables.concat(TEMP[config].mild)
+    else if (temp < 75) wearables = wearables.concat(TEMP[config].comfortable)
+    else if (temp < 80) wearables = wearables.concat(TEMP[config].warm)
+    else if (temp >= 80) wearables = wearables.concat(TEMP[config].hot)
 
     
     if (precip > 20) wearables = wearables.concat(PRECIP[precipType])

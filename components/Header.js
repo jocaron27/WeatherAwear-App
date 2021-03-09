@@ -10,20 +10,17 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Text,
 } from 'react-native';
 import { Logo } from './Logo';
-import { Colors } from '../config/colors';
+import Gear from '../assets/icons/gear.svg';
 
-const Header = ({ unit, toggleUnitPref }) => {
+const Header = ({ toggleSettings }) => {
 
   return (
     <View style={styles.header}>
       <Logo />
-      <TouchableOpacity style={styles.toggle} onPress={toggleUnitPref}>
-        <Text style={styles.toggleText}>
-          {`switch to ${unit === 'F' ? 'Celsius' : 'Fahrenheit'}`}
-        </Text>
+      <TouchableOpacity style={styles.gear} onPress={toggleSettings}>
+        <Gear width={20} />
       </TouchableOpacity>
     </View>
   );
@@ -34,18 +31,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flexGrow: 1,
   },
-  toggle: {
+  gear: {
     display: 'flex',
     justifyContent: 'center',
     paddingRight: 20
-  },
-  toggleText: { 
-    color: Colors.white,
-    fontFamily: 'Questrial-Regular',
-    fontSize: 11,
-    lineHeight: 11,
   },
 });
 
