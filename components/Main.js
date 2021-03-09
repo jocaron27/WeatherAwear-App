@@ -15,7 +15,8 @@ import {
   ImageBackground,
   Dimensions,
   PermissionsAndroid,
-  Platform
+  Platform,
+  BackHandler
 } from 'react-native';
 
 import { AdMobInterstitial } from 'react-native-admob';
@@ -88,6 +89,10 @@ const Main = ({
   };
 
   const toggleSettings = () => setShowSettings(!showSettings);
+
+  const handleBack = () => {
+    if (showSettings) setShowSettings(false);
+  }
 
   // Unit Pref methods
   const getUnitPref = async () => {
@@ -231,6 +236,9 @@ const Main = ({
     getUnitPref();
     if (SplashScreen && SplashScreen.hide) SplashScreen.hide();
     AdMobInterstitial.setAdUnitID('ca-app-pub-9279593135031162/7046496130');
+    BackHandler.addEventListener('hardwareBackPress', handleBack);
+  
+    return BackHandler.removeEventListener('hardwareBackPress', handleBack);
   }, []);
 
   useEffect(() => {
@@ -270,7 +278,10 @@ const Main = ({
           </View>
       : showSettings
         ? <>
-            <Header toggleSettings={toggleSettings} />
+            <Header
+              toggleSettings={toggleSettings}
+              settingsOn={showSettings}
+            />
             <Settings
                 toggleUnitPref={toggleUnitPref}
                 unit={unit}

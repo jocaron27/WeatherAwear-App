@@ -26,7 +26,7 @@ export const Settings = ({
     <View style={styles.body}>
       <Text style={styles.title}>Settings</Text>
       <Text style={styles.header}>
-        Units
+        Forecast
       </Text>
       <TouchableOpacity onPress={toggleUnitPref}>
         <Text style={styles.text}>
@@ -37,7 +37,7 @@ export const Settings = ({
         Wearables
       </Text>
       <Text style={styles.instructions}>
-        Select a statement to customize your recommendations:
+        - Customize your recommendations -
       </Text>
       <TouchableOpacity onPress={() => setTempConfigPref('Hot')}>
         <Text style={[tempConfig === 'Hot' ? styles.selected : null, styles.text]}>
@@ -55,7 +55,7 @@ export const Settings = ({
         </Text>
       </TouchableOpacity>
       <Text style={styles.instructions}>
-        Tap an item to hide it from your suggestions:
+        - Tap to hide items from your suggestions -
       </Text>
       <Wearables wearables={ALL_WEARABLES} settings={true} />
     </View>
@@ -79,16 +79,17 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontFamily: 'Radley-Regular',
     fontSize: 20,
-    marginVertical: 23,
+    marginVertical: 15,
     marginLeft: 5,
     borderBottomColor: Colors.white,
     borderBottomWidth: 1,
   },
   instructions: {
-    color: Colors.white,
+    color: Colors.lilac,
     fontFamily: 'Radley-Regular',
     fontSize: 16,
-    marginVertical: 23,
+    marginTop: 20,
+    marginBottom: 10,
     marginLeft: 8,
   },
   text: { 

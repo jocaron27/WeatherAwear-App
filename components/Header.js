@@ -13,24 +13,29 @@ import {
 } from 'react-native';
 import { Logo } from './Logo';
 import Gear from '../assets/icons/gear.svg';
+import { Colors } from '../config/colors';
 
-const Header = ({ toggleSettings }) => {
+const Header = ({ toggleSettings, settingsOn }) => {
 
   return (
     <View style={styles.header}>
       <Logo />
       <TouchableOpacity style={styles.gear} onPress={toggleSettings}>
-        <Gear width={20} />
+        <Gear width={20} style={settingsOn ? styles.on : null} />
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  on: {
+    padding: 12
+  },
   header: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10
   },
   gear: {
     display: 'flex',
