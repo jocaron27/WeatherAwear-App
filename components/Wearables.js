@@ -28,7 +28,6 @@ const Wearables = ({
 
   const getHiddenWearables = async () =>{
     const hiddenSaved = await getCacheData('hiddenWearables');
-    console.log(hiddenSaved);
     if (hiddenSaved) setHidden(hiddenSaved);
   }
 
