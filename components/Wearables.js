@@ -61,7 +61,7 @@ const Wearables = ({
       return wearable;
     });
     setDisplayWearables(wearablesWithHideLogic);
-  }, [hidden, timeOfDay]);
+  }, [wearables, hidden, timeOfDay]);
 
   return (
     <View style={styles.body}>
